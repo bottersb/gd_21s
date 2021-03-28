@@ -6,23 +6,22 @@
 	<link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
 
 	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery-ui-dist@1.12.1/jquery-ui.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0.16/dist/svg.min.js"></script>
 	
+	<script src="js/SunCalc.js"></script>
 	<script src="js/main.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="main.css">
 </head>
 <body>
-<!--canvas>
-
-</canvas-->
 <div id="canvas">
 	<div class="clock">
 		<span class="hour"></span>
 		<span class="minute"></span>
 		<span class="dot"></span>
 	</div>
-	<!--div id="playbutton"></div-->
+	<div id="playbutton" class="sunCicle"></div>
 
 	<div id="controls_speed">
 		<div id="pause" class="controlsSpeed"><img src="img/pause.png"></div>
@@ -30,6 +29,8 @@
 		<div id="faster" class="controlsSpeed"><img src="img/faster.png"></div>
 		<div id="fastest" class="controlsSpeed"><img src="img/fastest.png"></div>
 	</div>
+
+	<div id="info"></div>
 </div>
 </body>
 </html>
