@@ -1,21 +1,20 @@
-var settings;
-
-var svg;
-var svgStore;
-
 var date = new Date();
 var tickSpeed = 50; // milliseconds till next frame
 var minuteStep = 1; // minutes per tick
 var gamespeed = 0; // speed factor for minute step
+var currentPercent = 0; // approx sun percent
 
-var sunPercent, clockTimer;
+var tickCounter = 0;
 
-var sunAnimDuration, solarMinPerDay;
+var sunPercent, clockTimer; // timer
 
-var currentPercent = 0;
+var sunAnimDuration, minTillNextNoon; // daily
 
+// sun
 const pos = {"lat":48.2, "lon":16.3}; //vienna, at
-var sunTimes, sunTimesSorted, sunTimesTomorow;
+var sunTimes, sunTimesSorted, sunTimesTomorrow;
+
+// lookup
 var color = {
 	"nadir":"#000000",
 	"nightEnd":"#050510",
@@ -31,164 +30,88 @@ var color = {
 	"night":"#050510"
 }; 
 
-function setSunTimer(){
-	return setInterval(function(){
-		if(currentPercent < 100)
-		{
-			currentPercent += 1;
-		}
-		else {
-			currentPercent = 0;
-		}
-		updateInfo();
-	}, Math.ceil(sunAnimDuration/100));
-}
-
-function setClockTimer(){
-	return setInterval(clock, tickSpeed);
-}
-
-function updateInfo(){
-	$("#info").text(currentPercent + '%');
-}
-
 $(document).ready(function() {
-	settings = loadFileSync('res/config.json', 'json');
-	getSunData();
+	getSunData(); // first
 	initClock();
 	adjustGameSpeed(0, $("#pause"));
-	updateInfo();
+	setListener();
 	
-	$(".controlsSpeed").hover(function() { 
-		$(this).toggleClass('shadow');
-	});
-	$("#pause").click(function() {
-		adjustGameSpeed(0, this);
-	});
-	$("#play").click(function() {
-		adjustGameSpeed(1, this);
-	});
-	$("#faster").click(function() {
-		adjustGameSpeed(2, this);
-	});
-	$("#fastest").click(function() {
-		adjustGameSpeed(4, this);
-	});
-
 	console.log("ready!");
-
 });
 
-function fadeColor(lower, upper, fade){
-	var l = hexToRgb(lower);
-	var u = hexToRgb(upper);
-	var newRed = ((u.r - l.r) * fade ) + l.r;
-	var newGreen = ((u.g - l.g) * fade ) + l.g;
-	var newBlue = ((u.b - l.b) * fade ) + l.b;
+function update(){
+	tickCounter += 1;
+	//l(tickCounter);
 
-	return rgbToHex(newRed, newGreen, newBlue);
-}
-
-function getColorForTime(time){
-	var result = {};
-	var i = sunTimesSorted.map(t => t[1]).findIndex(st => st > time);
-	//TODO crashes when done before nadir
-	var duration = sunTimesSorted[i][1] - sunTimesSorted[i-1][1];
-	var fade = (sunTimesSorted[i][1] - time) / duration;
-	
-	result["index"] = i;
-	result["duration"] = duration;
-	result["color"] = fade;
-
-	return fadeColor(color[sunTimesSorted[i-1][0]], color[sunTimesSorted[i][0]], fade);
-}
-
-function hexToRgb(hex) {
-	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-	return result ? {
-		r: parseInt(result[1], 16),
-		g: parseInt(result[2], 16),
-		b: parseInt(result[3], 16)
-	} : null;
-}
-
-function rgbToHex(red, green, blue) {
-	const rgb = (red << 16) | (green << 8) | (blue << 0);
-	return '#' + (0x1000000 + rgb).toString(16).slice(1);
-}
-
-function adjustGameSpeed(factor, element) {
-	gamespeed = factor;
-	updateAnimDuration();
-	clearInterval(sunPercent);
-	clearInterval(clockTimer);
-	if(factor <= 0) {
-		$('.sunCicle').css('animation-play-state', 'paused');
-	} else {
-		$('.sunCicle').css('animation-duration', sunAnimDuration + "ms");
-		$('.sunCicle').css('animation-play-state', 'running');
-		sunPercent = setSunTimer();
-		clockTimer = setClockTimer();
-	}
-
-	$('.controlsSpeed').removeClass('selected');
-	$(element).toggleClass('selected');
-}
-
-function updateAnimDuration(){
-	sunAnimDuration = Math.floor(((solarMinPerDay/minuteStep)*tickSpeed)/(gamespeed > 0 ? gamespeed : 1));
+	clock();
+	updateColor();
 }
 
 function getSunData(){
+	// store sun times for here and now
 	sunTimes = SunCalc.getTimes(date, pos.lat, pos.lon);
-	sunTimesTomorow = SunCalc.getTimes(new Date (sunTimes.solarNoon.getTime() + 86400000), pos.lat, pos.lon);
-	solarMinPerDay = (sunTimesTomorow.solarNoon - sunTimes.solarNoon)/1000/60;
-	updateAnimDuration();
+	
+	// store sorted sun times for here and now
+	sortSunTimes();
+	
+	// store sun times plus 1 day
+	var tomorrow = new Date (sunTimes.solarNoon.getTime() + 1000*60*60*24);
+	sunTimesTomorrow = SunCalc.getTimes(tomorrow, pos.lat, pos.lon);
+
+	// calculate exact minutes until full sun cicle
+	minTillNextNoon = (sunTimesTomorrow.solarNoon - sunTimes.solarNoon)/1000/60;
+
+	// calculate fuzzy minutes until full sun cicle
+	minTillNextNoon = Math.round(minTillNextNoon*2)/2;
+	
+	updateSunAnimDuration();
+}
+
+// minTillNextNoon to real world ms according to current 
+function updateSunAnimDuration(){
+	sunAnimDuration = Math.floor(((minTillNextNoon/minuteStep)*tickSpeed)/(gamespeed > 0 ? gamespeed : 1));	
+}
+
+// sunTimesSorted reset and refill
+function sortSunTimes(){
 	sunTimesSorted = [];
 	for (var time in sunTimes) {
 		sunTimesSorted.push([time, sunTimes[time]]);
 	}
-
 	sunTimesSorted.sort(function(a, b) {
 		return a[1] - b[1];
 	});
-
-	SunCalc.getPosition(date,pos.lat, pos.lon);
 }
 
-function loadSvg(domTarget, location){
-	var contents = loadFileSync(location);
-	return SVG().addTo(domTarget).size(1000, 1000).svg(contents);
-}
-
-function loadFileSync(location, dataType){
-	var result = null;
-	$.ajax({
-		'async': false,
-		'global': false,
-		'url': location,
-		'dataType': dataType,
-		'success': function (data) {
-			result = data;
-		}
+// color
+function updateColor(){
+	$("#playbutton").css({
+		"background-color": getColorForTime(date)
 	});
-	return result;
 }
 
-function clock() {
-	var newDate = new Date(date.getTime() + (minuteStep*60000)*gamespeed);
-	// check for new day
-	if(newDate.getDay() != date.getDay()){
-		getSunData();
+function getColorForTime(time){
+	// get new index
+	var i = sunTimesSorted.map(t => t[1]).findIndex(st => st > time);
+
+	var duration;
+	if(i == 0) {
+		duration = date - sunTimesSorted[i][1];
+	} else {
+		duration = sunTimesSorted[i][1] - sunTimesSorted[i-1][1];
 	}
-	date = newDate;
-	const hour = ((date.getHours() + 11) % 12 + 1) * 30;
-	const minute = date.getMinutes() * 6;
+	var fade = (sunTimesSorted[i][1] - time) / duration;
 
-	document.querySelector('.hour').style.transform = `rotate(${hour}deg)`
-	document.querySelector('.minute').style.transform = `rotate(${minute}deg)`
+	var col;
+	if(i == 0) {
+		col = fadeColor(date, color[sunTimesSorted[i+1][0]], fade);
+	} else {
+		col = fadeColor(color[sunTimesSorted[i-1][0]], color[sunTimesSorted[i][0]], fade);
+	}
+	return col;
 }
 
+// clock
 function initClock(){
 	date = sunTimes.solarNoon;
 	const hour = ((date.getHours() + 11) % 12 + 1) * 30;
@@ -198,29 +121,86 @@ function initClock(){
 	document.querySelector('.minute').style.transform = `rotate(${minute}deg)`;
 }
 
-function getAllEvents(element) {
-	var result = [];
-	for (var key in element) {
-		if (key.indexOf('on') === 0) {
-			result.push(key.slice(2));
+function clock() {
+	// minute lookahead
+	var newDate = new Date(date.getTime() + (1000*60*gamespeed));
+	// check for new day
+	if(newDate.getDay() != date.getDay()){
+		// get sun data for current day + tomorrow
+		getSunData();
+	}
+	// update for exact time
+	date = newDate;
+	const hour = ((date.getHours() + 11) % 12 + 1) * 30;
+	const minute = date.getMinutes() * 6;
+	document.querySelector('.hour').style.transform = `rotate(${hour}deg)`;
+	document.querySelector('.minute').style.transform = `rotate(${minute}deg)`;
+}
+
+// general app speed
+function updateSpeed(){
+	updateSunAnimDuration();
+	clearTimers();
+	setTimers();
+}
+
+function adjustGameSpeed(factor, element) {
+	gamespeed = factor;
+	if(factor <= 0) {
+		$('.sunCicle').css('animation-play-state', 'paused');
+	} else {
+		$('.sunCicle').css('animation-duration', sunAnimDuration + "ms");
+		$('.sunCicle').css('animation-play-state', 'running');
+	}
+
+	$('.controlsSpeed').removeClass('selected');
+	$(element).toggleClass('selected');
+}
+
+// timer
+function setSunPercentTimer(){
+	return setInterval(function(){
+		if(currentPercent < 100)
+		{
+			currentPercent += 1;
 		}
-	}
-	return result.join(' ');
+		else {
+			currentPercent = 0;
+		}
+		$("#info").text(currentPercent + '%');
+	}, Math.ceil(sunAnimDuration/100));
 }
 
-function l(msg){
-	console.log(msg);
+function setTimers(){
+	sunPercent = setSunPercentTimer();
+	clockTimer = setInterval(update, tickSpeed);
 }
 
-const animator = {
-	items: [],
-	add(...items) {
-		this.items.push(...items);
-	},
-	get(index) {
-		return this.items[index];
-	},
-	toggle(){
+function clearTimers(){
+	l("clear timer");
+	clearInterval(sunPercent);
+	clearInterval(clockTimer);
+}
 
-	}
-};
+// listener
+function setListener(){
+	$(".controlsSpeed").hover(function() { 
+		$(this).toggleClass('shadow');
+	});
+	$("#pause").click(function() {
+		adjustGameSpeed(0, this);
+		updateSpeed();
+	});
+	$("#play").click(function() {
+		adjustGameSpeed(1, this);
+		updateSpeed();
+	});
+	$("#faster").click(function() {
+		adjustGameSpeed(2, this);
+		updateSpeed();
+	});
+	$("#fastest").click(function() {
+		adjustGameSpeed(4, this);
+		updateSpeed();
+	});
+}
