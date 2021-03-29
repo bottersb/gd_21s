@@ -18,18 +18,15 @@ body {
 }
 
 #canvas {
-	//background-color: #D9D7DD;
-	background-color: #fff;
+	background-color: #ddd;
 	width: 1280px;
 	height: 800px;
 	margin: 0 auto;
 
-	background-image: url("img/GD_002.jpg");
+	//background-image: url("img/GD_002.jpg");
 	background-size: cover;
 	position: relative;
 }
-
-
 
 .clock {
 	width: 100px;
@@ -101,8 +98,10 @@ body {
 	top: 300px;
 	right: 50px;
 
-	//background-color: #D9D7DD;
 	display: block;
+	background-color: #f9f1c9;
+	opacity: 0.5;
+	filter: brightness(1.75);
 }
 
 .sunCicle {
@@ -133,7 +132,6 @@ body {
 	50% {background: #000000;}
 }
 
-
 #controls_speed {
 	height: 26px;
 
@@ -149,7 +147,6 @@ body {
 	height: 100%;
 	position: relative;
 	margin: 6px;
-	//background-color: #eee;
 }
 
 .controlsSpeed img {
@@ -157,18 +154,12 @@ body {
 	max-height: 100%;
 	vertical-align: middle;
 }
-
-#info{
-
-}
 .shadow{
 	-webkit-box-shadow: 5px 5px 10px #666;
-	box-shadow: 5px 5px 10px #666; /* For IE 8 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=10, Direction=135, Color='#cccccc')"; /* For IE 5.5 - 7 */
+	box-shadow: 5px 5px 10px #666;
 }
 
 .selected{
 	-webkit-box-shadow: 5px 5px 10px #326;
-	box-shadow: 5px 5px 10px #326; /* For IE 8 */
-	
+	box-shadow: 5px 5px 10px #326; 
 }

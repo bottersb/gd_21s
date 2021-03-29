@@ -9,6 +9,7 @@ function fadeColor(lower, upper, fade){
 	return rgbToHex(newRed, newGreen, newBlue);
 }
 
+// requires 6 digit hex value, not 	necessarily 
 function hexToRgb(hex) {
 	var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
 	return result ? {
@@ -18,6 +19,7 @@ function hexToRgb(hex) {
 	} : null;
 }
 
+// will return 
 function rgbToHex(red, green, blue) {
 	const rgb = (red << 16) | (green << 8) | (blue << 0);
 	return '#' + (0x1000000 + rgb).toString(16).slice(1);
