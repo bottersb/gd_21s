@@ -12,40 +12,40 @@ Eine Simulation kann ein bierernstes wissenschaftliches Werkzeug sein, Arbeit, m
 Mit der richtigen Visualisierung kann hier pädagogisch viel geleistet werden. Die richtige Animation schafft es die Parameter und die Auswirkungen des eigenen Handeln klar zu verdeutlichen. 
 Schlaf ist typischerweise eine Indoor-Activity, meistens findet sie im Schlafzimmer einer Person statt. Es bietet sich als Szene also ein Zimmer an.
 Welche Einrichtungsgegenstände kann es geben:
-• Stuhl
-• Tisch + Zeug
-• Schrank + Zeug 
-• Tür
-• Regal + Zeug
-• Nachtisch + Zeug
-• Pflanze
-• Spiel/Sport/Hobby Gerät
-• Kunst/Poster/Figuren
-• Teppich
-• Müll
+ - Stuhl
+ - Tisch + Zeug
+ - Schrank + Zeug 
+ - Tür
+ - Regal + Zeug
+ - Nachtisch + Zeug
+ - Pflanze
+ - Spiel/Sport/Hobby Gerät
+ - Kunst/Poster/Figuren
+ - Teppich
+ - Müll
 
 Welche externen (auf die Spielfigur wirkend) und internen (Zustände der Spielfigur) Parameter kann es im Bezug auf Schlaf geben:
-• Helligkeit
-• Stress
-• Lautstärke
-• Müdigkeit
-• Energie
-• Ernährung
-• Körpertemperatur
-• Lebenserwartung
-• Neuroplastizität
-• Hormonspiegel
-• Sauerstoff
-• Schlafdauer
-• Schlafintervall
+ - Helligkeit
+ - Stress
+ - Lautstärke
+ - Müdigkeit
+ - Energie
+ - Ernährung
+ - Körpertemperatur
+ - Lebenserwartung
+ - Neuroplastizität
+ - Hormonspiegel
+ - Sauerstoff
+ - Schlafdauer
+ - Schlafintervall
 
 Spiele zeichnen sich durch Interaktivität aus. Irgendwie muss man diese Parameter beeinflussen können. Welche Objekte kann es geben, die die genannten Parameter beeinflussen oder davon beeinflusst werden:
-• Betten (Qualität)
-• Kalender (Schedule)
-• Uhren
-• Fenster (Offen/Geschlossen, Vorhänge)
-• Lampen (Decken-, Steh-, Nachtisch-, Leuchtreklame, Nachtlampe, Lämpchen an elekt. Geräten)
-• Bildschirmgeräte (Computer, Tablet, Smartphone, Fernseher)
+ - Betten (Qualität)
+ - Kalender (Schedule)
+ - Uhren
+ - Fenster (Offen/Geschlossen, Vorhänge)
+ - Lampen (Decken-, Steh-, Nachtisch-, Leuchtreklame, Nachtlampe, Lämpchen an elekt. Geräten)
+ - Bildschirmgeräte (Computer, Tablet, Smartphone, Fernseher)
 
 ## Task
 Es gibt einiges zu tun. Ich werde mich um die Hauptlogik des Spiels kümmern, alleine werde ich es aber nicht schaffen die Szene mit all den genannten Objekten zu füllen. Hier seid ihr gefragt, bitte helft mir beim zeitintensiven Unterfangen Objekte zu erstellen. Bitte seid so gut und **erstellt je ein Objekt und je eine Statusanzeige mittels p5.js**. 
