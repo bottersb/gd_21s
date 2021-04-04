@@ -48,22 +48,73 @@ var sunColor = {},
 	weatherEnd = 0;
 
 // fonts
-let fontRegular;
+var fontRegular;
+
+// buttons
+var pause, play, faster, fastest;
+
+// misc
+var cnv;
 
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
 }
 
+function controlsEventHandler(event) {
+	switch (event.type) {
+		case 'mouseover':
+			event.target.classList.toggle("shadow");
+			break;
+		case 'mouseout':
+			event.target.classList.toggle("shadow");
+			break;
+		case 'mouseup':
+			pause.elt.classList.remove("selected");
+			play.elt.classList.remove("selected");
+			faster.elt.classList.remove("selected");
+			fastest.elt.classList.remove("selected");
+			event.target.classList.toggle("selected");
+			gameSpeed = event.target.speed;
+			break;
+	}
+}
+
+function loadControls() {
+	var xPos = 1000, p = 0, dim = 40;
+	pause = createImg('img/pause.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	pause.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
+	pause.elt.draggable = false;
+	pause.elt.name = "pause";
+	pause.elt.speed = 0;
+
+	play = createImg('img/play.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	play.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
+	play.elt.draggable = false;
+	play.elt.name = "play";
+	play.elt.speed = 1;
+	play.elt.classList.toggle("selected");
+
+	faster = createImg('img/faster.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	faster.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
+	faster.elt.draggable = false;
+	faster.elt.name = "faster";
+	faster.elt.speed = 2;
+
+	fastest = createImg('img/fastest.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	fastest.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
+	fastest.elt.draggable = false;
+	fastest.elt.name = "fastest";
+	fastest.elt.speed = 4;
+}
 
 var cloudCount = 8;
 var clouds = [];
 function setup() {
-	createCanvas(1280, 800);
+	cnv = createCanvas(1280, 800);
 	frameRate(FRAMES_PER_SEC);
 
-	for (let i = 0; i < 100; i++) {
-		clouds.push(new Cloud(RAND(width) - width, RAND(height), RANDP(20)));
-	}
+	loadControls();
+	//console.log(pause);
 }
 
 
@@ -71,28 +122,32 @@ function draw() {
 	updateDelta();
 	drawSunCicle();
 
-
-	drawAllClouds();
+	//drawControls();
+	//drawAllClouds();
 
 	if (debug) {
 		debugDisplay();
 	}
 }
 
+
+
 function drawAllClouds() {
-	for (let i = 0; i < clouds.length; i++) {
-		if (frameCounter % (MIN_PER_DAY / 4) == 0) {
-			clouds = [];
-			for (let i = 0; i < 100; i++) {
-				clouds.push(new Cloud(RAND(width) - (width*1.5), RAND(height), RANDP(20)));
-			}
-		} else {
-			clouds[i].update(3)
+	if (frameCounter % (MIN_PER_DAY / 4) == 0) {
+		clouds = [];
+		for (let i = 0; i < 50; i++) {
+			clouds.push(new Cloud(RAND(width) - (width * 1.5), RAND(height)));
 		}
-		clouds[i].draw();
 	}
+
+	var l = clouds.length;
+	while (l--) {
+		clouds[l].update(3).draw()
+	}
+
 }
 
+// TODO actually check weather
 function checkWeather() {
 	if (!weather) {
 		return;
@@ -110,8 +165,8 @@ var Cloud = class {
 	z = 0;
 
 	constructor(x, y, factor = 1) {
-		var size = round(200 * factor);
-		var kummuli = round(12 * factor);
+		var size = round(250 * factor);
+		var kummuli = round(8 * factor);
 		this.z = RANDP(3);
 		for (let i = 0; i < kummuli; i++) {
 			let w = RAND(size),
