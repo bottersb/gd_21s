@@ -1,11 +1,12 @@
 // SLEEP
 // 
-// game is designed to run at 1 ingame minute per frame at normal game speed
+// game is designed to run at 1 ingame minute per frame at normal (1x) game speed
+// 
 
 const SEED = 42,
 	RAND = SeedRandom(SEED),
 	MIN_PER_DAY = 24 * 60, // 1440
-	RAD_PER_MIN = (2 * Math.PI) / MIN_PER_DAY; // ~0.004363
+	RAD_PER_MIN = (2 * Math.PI) / MIN_PER_DAY; // ~0.004363, 
 
 const RANDP = function () {
 	return RAND(100) / 100;
@@ -52,9 +53,6 @@ var fontRegular;
 
 // buttons
 var pause, play, faster, fastest;
-
-// misc
-var cnv;
 
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
@@ -193,7 +191,7 @@ var Cloud = class {
 	}
 
 	update(v) {
-		this.xOffset = v;
+		this.xOffset = v*gameSpeed;
 		return this;
 	}
 }
