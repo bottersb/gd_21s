@@ -18,4 +18,6 @@ Sleep deprivation can have negative long term effects on the health of the perso
 
 Our game will be a simulation on the topic of "sleep". A simulation is characterized by the use of differently weighted parameters that constantly influence the events. If the parameters are the same, the simulation will always run the same way. Due to human input or random events, there will almost never be two identical simulations. When simulation is the main component of a game, the goal is often to optimize certain values. In terms of business, simulation is used to optimize costs while keeping other values stable, such as employee satisfaction, safety levels, or public perception. Adjusting the possible parameters of a system to achieve an optimum can be both a challenging and rewarding task, especially when the parameters have a non-linear effect. Think here of the shower or the oven, whose heat one often intentionally overshoots because of the delay in starting it, only to turn it back to the desired temperature afterwards. Some parameters can have an exponential effect, a tendency that people often underestimate. 
 
-### 
+### Concept
+
+The goal of the player will be to

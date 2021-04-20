@@ -23,10 +23,6 @@ const SUMMER = function (v) { return max(0.1, EasingFunctions.easeOutCubic(v) * 
 // settings
 var gameSpeed = 1,
 	season = SUMMER,
-	weather = true,
-	weatherInterval = MIN_PER_DAY * 2,
-	weatherDuration = MIN_PER_DAY * 2.5,
-	weatherRandomness = false,
 	debug = true, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
 
@@ -44,9 +40,7 @@ var frameCounter = 0, // frame counter, integer increased each tick
 	deltaT = 0; // progress in ms since last frame
 
 var sunColor = {},
-	skyColor = {},
-	weatherStart = 0,
-	weatherEnd = 0;
+	skyColor = {};
 
 // fonts
 var fontRegular;
@@ -54,26 +48,30 @@ var fontRegular;
 // buttons
 var pause, play, faster, fastest;
 
+// interior
+var bed, bonsai;
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
+	bed = loadImage('bed-575800_640.png');
+	bonsai = loadImage('bonsai-154570_640.png');
 }
 
-function controlsEventHandler(event) {
-	switch (event.type) {
-		case 'mouseover':
-			event.target.classList.toggle("shadow");
-			break;
-		case 'mouseout':
-			event.target.classList.toggle("shadow");
-			break;
-		case 'mouseup':
-			pause.elt.classList.remove("selected");
-			play.elt.classList.remove("selected");
-			faster.elt.classList.remove("selected");
-			fastest.elt.classList.remove("selected");
-			event.target.classList.toggle("selected");
-			gameSpeed = event.target.speed;
-			break;
+function setup() {
+	createCanvas(1280, 800);
+	frameRate(FRAMES_PER_SEC);
+	
+	loadControls();
+}
+
+function draw() {
+	updateDelta();
+	drawSunCicle();
+	//drawAllClouds();
+	drawInterior();
+	
+	drawOutline();
+	if (debug) {
+		debugDisplay();
 	}
 }
 
@@ -105,44 +103,75 @@ function loadControls() {
 	fastest.elt.speed = 4;
 }
 
-var cloudCount = 8;
-var clouds = [];
-function setup() {
-	cnv = createCanvas(1280, 800);
-	frameRate(FRAMES_PER_SEC);
-
-	loadControls();
-	//console.log(pause);
-}
-
-
-function draw() {
-	updateDelta();
-	drawSunCicle();
-
-	//drawControls();
-	//drawAllClouds();
-
-	if (debug) {
-		debugDisplay();
+function controlsEventHandler(event) {
+	switch (event.type) {
+		case 'mouseover':
+			event.target.classList.toggle("shadow");
+			break;
+		case 'mouseout':
+			event.target.classList.toggle("shadow");
+			break;
+		case 'mouseup':
+			pause.elt.classList.remove("selected");
+			play.elt.classList.remove("selected");
+			faster.elt.classList.remove("selected");
+			fastest.elt.classList.remove("selected");
+			event.target.classList.toggle("selected");
+			gameSpeed = event.target.speed;
+			break;
 	}
 }
 
+function drawOutline(){
+	strokeWeight(2);
+	stroke(200);
+	fill(col_main_dark);
+	rect(0,0, width,63);
+	textSize(38);
+	fill(255);
+	text('Schlaf', 15, 45);
 
+	fill(col_main);
+	rect(0,height-70, width,height);
+	noStroke();
+	fill("gray");
+	rect(0,height-30, width,height);
+}
 
-function drawAllClouds() {
-	if (frameCounter % (MIN_PER_DAY / 4) == 0) {
-		clouds = [];
-		for (let i = 0; i < 50; i++) {
-			clouds.push(new Cloud(RAND(width) - (width * 1.5), RAND(height)));
-		}
-	}
+const fenster = {
+	x:200,
+	y:200,
+	w:300,
+	h:250
+},
+tuer = {
+	x:200,
+	y:200,
+	w:300,
+	h:250
+};
 
-	var l = clouds.length;
-	while (l--) {
-		clouds[l].update(3).draw()
-	}
+const imgSize = 640;
+var edge = 600, padding = 10;
 
+function drawInterior(){
+	noStroke();
+	
+	// wall
+	fill("SandyBrown");
+	rect(0,0,width,edge);
+	// floor
+	fill("Khaki");
+	rect(0,edge,width,height-edge);
+	// window
+	fill("brown");
+	rect(fenster.x,fenster.y,fenster.w,fenster.h);
+	fill(skyColor);
+	rect(fenster.x+padding,fenster.y+padding,fenster.w-(2*padding),fenster.h-(2*padding));
+	
+
+	image(bed, 30, edge-200);
+	image(bonsai, width/2, edge-200, imgSize/3, imgSize/3);
 }
 
 // TODO actually check weather
@@ -154,45 +183,6 @@ function checkWeather() {
 	if (weatherEnd <= frameCounter) {
 		weatherStart = frameCounter + RANDP(2 * weatherInterval);
 		weatherEnd = weatherStart + RANDP(2 * weatherDuration);
-	}
-}
-
-var Cloud = class {
-	components = [];
-	xOffset = 0;
-	z = 0;
-
-	constructor(x, y, factor = 1) {
-		var size = round(250 * factor);
-		var kummuli = round(8 * factor);
-		this.z = RANDP(3);
-		for (let i = 0; i < kummuli; i++) {
-			let w = RAND(size),
-				x_ = x + RAND(size),
-				y_ = y + (RAND(size) / 5),
-				h = round(w / 3);
-			this.components.push({ x: x_, y: y_, w: w, h: h });
-		}
-		return this;
-	}
-
-	draw() {
-		ellipseMode(CENTER);
-		noStroke();
-		for (let i = 0; i < this.components.length; i++) {
-			let c = this.components[i];
-			for (let j = 0; j < 3; j++) {
-				fill(255 - (j * 10));
-				c.x = c.x + this.xOffset + this.z;
-				ellipse(c.x, c.y - (2 * j), c.w, c.h);
-			}
-		}
-		this.xOffset = 0;
-	}
-
-	update(v) {
-		this.xOffset = v*gameSpeed;
-		return this;
 	}
 }
 
@@ -211,7 +201,7 @@ var getSunHeight = function () {
 }
 
 function debugDisplay() {
-	let tSize = 20, p = 1;
+	let tSize = 20, p = 5;
 	strokeWeight(2);
 	stroke(0);
 	fill(200);

@@ -13,3 +13,60 @@ body {
 	-webkit-box-shadow: 5px 5px 10px #326;
 	box-shadow: 5px 5px 10px #326; 
 }
+
+.clock {
+	width: 100px;
+	height: 100px;
+
+	position: absolute;
+	top: 50px;
+	right: 50px;
+	
+	border-radius: 100%;
+	background: #ddd;
+	border: 5px solid #ddd;
+	box-shadow: inset 2px 3px 8px 0 rgba(0, 0, 0, 0.1);
+}
+
+.minute,
+.hour {
+	position: absolute;
+	height: 28%;
+	width: 2%;
+	margin: auto;
+	top: -27%;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: black;
+	transform-origin: bottom center;
+	transform: rotate(0deg);
+	box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
+	z-index: 1;
+}
+
+.minute {
+	position: absolute;
+	height: 37%;
+	width: 1%;
+	top: -38%;
+	left: 0;
+	box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
+	transform: rotate(90deg);
+}
+
+.dot {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	width: 3%;
+	height: 3%;
+	border-radius: 30%;
+	background: white;
+	border: 2px solid #1b1b1b;
+	border-radius: 30%;
+	margin: auto;
+	z-index: 1;
+}
