@@ -20,4 +20,25 @@ Our game will be a simulation on the topic of "sleep". A simulation is character
 
 ### Concept
 
-The goal of the player will be to
+The goal of the player will be to optimze parameters and values revolving around sleep. Different parameters may be:
+
+- Melatonin
+- REM
+- Non-REM
+- Caffeine
+- Brightness
+- Stress
+- Loudness
+- Fatigue
+- energy
+- health
+- Nutrition
+- body temperature
+- Life expectancy
+- neuroplasticity
+- hormone levels
+- Oxygen levels
+- sleep duration
+- sleep interval
+
+In order to set these parameters the player will have to adjust a schedule defining when the player shall go to bed, be awake and perform physical or cognitive tasks. Furthermore the interior and exterior may have effects on the persons sleep cycle. For instance a lot of light polution may hinder the person from becoming tired due to lower Melatonin levels. The same is true for noises and other sources of stress. The short and long term effects of bad sleep management should become easily discernable for the player.
