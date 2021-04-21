@@ -16,13 +16,14 @@ const FRAMES_PER_SEC = 60, // when 60 fps, then:
 	TICK = 1000 / FRAMES_PER_SEC, // ~16,667ms
 	FULL_DAY = TICK * MIN_PER_DAY; // 24 seconds irl
 
+// Easing of sun height
 const SUMMER = function (v) { return max(0.1, EasingFunctions.easeOutCubic(v) * 100) },
 	WINTER = function (v) { return max(0.1, EasingFunctions.easeInCubic(v) * 80) },
 	SPRING = FALL = function (v) { return max(0.1, EasingFunctions.easeInOutCubic(v) * 90) };
 
 // settings
 var gameSpeed = 1,
-	season = SUMMER,
+	season = SPRING,
 	debug = true, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
 
@@ -39,6 +40,7 @@ var frameCounter = 0, // frame counter, integer increased each tick
 	then = Date.now(), // time reference for deltaT
 	deltaT = 0; // progress in ms since last frame
 
+
 var sunColor = {},
 	skyColor = {};
 
@@ -49,11 +51,19 @@ var fontRegular;
 var pause, play, faster, fastest;
 
 // interior
-var bed, bonsai;
+var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker;
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
-	bed = loadImage('bed-575800_640.png');
-	bonsai = loadImage('bonsai-154570_640.png');
+	lamp = loadImage('img/lamp-575998_640.png');
+	ball = loadImage('img/basketball-155997_640.png');
+	bed = loadImage('img/bed-575800_640.png');
+	bonsai = loadImage('img/bonsai-154570_640.png');
+	desk = loadImage('img/desk-575953_640.png');
+	chair = loadImage('img/office-chair-575881_640.png');
+	laptop = loadImage('img/computer-156583_640.png');
+	shelf = loadImage('img/shelf-159852_640.png');
+	counter = loadImage('img/counter-576093_640.png');
+	wecker = loadImage('img/clock-1293099_640.png');
 }
 
 function setup() {
@@ -140,13 +150,7 @@ function drawOutline(){
 
 const fenster = {
 	x:200,
-	y:200,
-	w:300,
-	h:250
-},
-tuer = {
-	x:200,
-	y:200,
+	y:150,
 	w:300,
 	h:250
 };
@@ -168,31 +172,35 @@ function drawInterior(){
 	rect(fenster.x,fenster.y,fenster.w,fenster.h);
 	fill(skyColor);
 	rect(fenster.x+padding,fenster.y+padding,fenster.w-(2*padding),fenster.h-(2*padding));
-	
+	fill("Yellow");
 
-	image(bed, 30, edge-200);
+	image(lamp,-10,edge-300,  imgSize/3, imgSize/2);
+	image(ball, 3*width/7+10, edge-50, imgSize/9, imgSize/9)
+	image(bed, 30, edge-190);
 	image(bonsai, width/2, edge-200, imgSize/3, imgSize/3);
-}
-
-// TODO actually check weather
-function checkWeather() {
-	if (!weather) {
-		return;
-	}
-
-	if (weatherEnd <= frameCounter) {
-		weatherStart = frameCounter + RANDP(2 * weatherInterval);
-		weatherEnd = weatherStart + RANDP(2 * weatherDuration);
-	}
+	image(desk, 3*width/4,edge-220, imgSize/2, imgSize/2);
+	image(chair, 3*width/5,edge-220, imgSize/3, imgSize/2);
+	image(laptop, 1060,edge-260, imgSize/5, imgSize/8);
+	image(shelf, width/2,height/5, imgSize/3, imgSize/4);
+	image(counter, width/11,2*height/3, 3*imgSize/4, imgSize/4);
+	image(wecker, width/11,2*height/3-40, imgSize/9, imgSize/8);
+	
+	// get light, darken room
+	let c = color('hsba(180, 100%, 0%,' + 0.80*(1-season(getSunHeight())/100)+ ')');
+	fill(c)
+	rect(0,0,width, height);
 }
 
 function drawSunCicle() {
-	// yellow
 	var sunHeight = (getSunHeight() + 1) / 2;
-	sunColor = color('hsb(45, 10%,' + season(sunHeight) + '%)');
 	// blue
 	skyColor = color('hsb(197, 43%,' + season(sunHeight) + '%)');
 	background(skyColor);
+	// yellow
+	sunColor = color('hsb(45, 10%,' + season(sunHeight) + '%)');
+	fill(sunColor);
+	noStroke();
+	circle(300,(height+cos(timeCounter) * 500),300);
 }
 
 // day starts at 0:00, sun should be lowest
