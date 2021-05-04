@@ -3,6 +3,7 @@
 // game is designed to run at 1 ingame minute per frame at normal (1x) game speed
 // 
 
+
 const SEED = 42,
 	RAND = SeedRandom(SEED),
 	MIN_PER_DAY = 24 * 60, // 1440
@@ -21,6 +22,14 @@ const SUMMER = function (v) { return max(0.1, EasingFunctions.easeOutCubic(v) * 
 	WINTER = function (v) { return max(0.1, EasingFunctions.easeInCubic(v) * 80) },
 	SPRING = FALL = function (v) { return max(0.1, EasingFunctions.easeInOutCubic(v) * 90) };
 
+const col_main = "#40752D",
+	col_main_t70 = "#40752Db3",
+	col_main_dark = "#335E24",
+	col_main_darkest = "#1A2F12",
+	col_main_light = "#5ca840",
+	col_main_lighter = "#D9E3D5",
+	col_main_lightest = "#ECF4E9";
+
 // settings
 var gameSpeed = 1,
 	season = SPRING,
@@ -31,7 +40,7 @@ var speedLimit = true, // fps upper limit to defined value of FRAMES_PER_SEC
 	skipLimit = false, // app may stop bc of background, when false progress will updated according to deltaT 
 	maxFrameSkipAmount = 1; // max amount of frames skipped 
 
-// related time representations and references
+// related, normalized time representations and references
 var frameCounter = 0, // frame counter, integer increased each tick
 	fpsShow = 0, // buffered value for delay	
 	timeCounter = 0, // current day time normalized to distance on unit circle
@@ -39,7 +48,6 @@ var frameCounter = 0, // frame counter, integer increased each tick
 	fpsNow = 0, // true time since last frame may vary and therefore the fps
 	then = Date.now(), // time reference for deltaT
 	deltaT = 0; // progress in ms since last frame
-
 
 var sunColor = {},
 	skyColor = {};
@@ -50,8 +58,38 @@ var fontRegular;
 // buttons
 var pause, play, faster, fastest;
 
-// interior
-var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker;
+const imgSize = 640;
+var edge = 600, padding = 10;
+var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board;
+
+var daySchedule = [
+	"Sleep",
+	"Sleep",
+	"Sleep",
+	"Sleep",
+	"Sleep",
+	"Sleep",
+	"Sleep",
+	"Recreation",
+	"Recreation",
+	"Work",
+	"Work",
+	"Work",
+	"Work",
+	"Recreation",
+	"Work",
+	"Work",
+	"Work",
+	"Work",
+	"Recreation",
+	"Recreation",
+	"Work",
+	"Work",
+	"Recreation",
+	"Sleep"
+];
+
+
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
 	lamp = loadImage('img/lamp-575998_640.png');
@@ -64,12 +102,14 @@ function preload() {
 	shelf = loadImage('img/shelf-159852_640.png');
 	counter = loadImage('img/counter-576093_640.png');
 	wecker = loadImage('img/clock-1293099_640.png');
+	monitor = loadImage('img/monitor-2026552_640.png');
+	board = loadImage('img/whiteboard-3205371_640.png');
 }
 
 function setup() {
 	createCanvas(1280, 800);
 	frameRate(FRAMES_PER_SEC);
-	
+
 	loadControls();
 }
 
@@ -78,7 +118,7 @@ function draw() {
 	drawSunCicle();
 	//drawAllClouds();
 	drawInterior();
-	
+	drawSchedule();
 	drawOutline();
 	if (debug) {
 		debugDisplay();
@@ -132,61 +172,192 @@ function controlsEventHandler(event) {
 	}
 }
 
-function drawOutline(){
+function drawOutline() {
 	strokeWeight(2);
 	stroke(200);
 	fill(col_main_dark);
-	rect(0,0, width,63);
+	rect(0, 0, width, 63);
 	textSize(38);
 	fill(255);
+	textAlign(LEFT, BASELINE);
 	text('Schlaf', 15, 45);
 
 	fill(col_main);
-	rect(0,height-70, width,height);
-	noStroke();
-	fill("gray");
-	rect(0,height-30, width,height);
+	//rect(0, height - 70, width, height);
+	//noStroke();
+	//fill("gray");
+	rect(0, height - 30, width, height);
 }
 
-const fenster = {
-	x:200,
-	y:150,
-	w:300,
-	h:250
-};
 
-const imgSize = 640;
-var edge = 600, padding = 10;
+// interior
+const fenster = {
+	x: 310,
+	y: 350,
+	w: 250,
+	h: 150
+}, i_ball = {
+	x: 600,
+	y: 600,
+	w: 50,
+	h: 50
+}, i_lamp = {
+	x: 300,
+	y: 560,
+	w: 100,
+	h: 140
+}, i_bed = {
+	x: 440,
+	y: 600,
+	w: 400,
+	h: 200
+}, i_bonsai = {
+	x: 700,
+	y: 570,
+	w: 100,
+	h: 100
+}, i_desk = {
+	x: 950,
+	y: 570,
+	w: 240,
+	h: 160
+}, i_chair = {
+	x: 800,
+	y: 600,
+	w: 140,
+	h: 180
+}, i_laptop = {
+	x: 950,
+	y: 480,
+	w: 80,
+	h: 50
+}, i_board = {
+	x: 1130,
+	y: 440,
+	w: 260,
+	h: 190
+}, i_shelf = {
+	x: 680,
+	y: 400,
+	w: 120,
+	h: 80
+}, i_counter = {
+	x: 440,
+	y: 630,
+	w: 300,
+	h: 80
+}
 
 function drawInterior(){
 	noStroke();
-	
 	// wall
 	fill("SandyBrown");
-	rect(0,0,width,edge);
+	rect(0, 0, width, edge);
 	// floor
 	fill("Khaki");
-	rect(0,edge,width,height-edge);
+	rect(0, edge, width, height - edge);
 	// window
 	fill("brown");
-	rect(fenster.x,fenster.y,fenster.w,fenster.h);
+	rect(fenster.x, fenster.y, fenster.w, fenster.h);
 	fill(skyColor);
-	rect(fenster.x+padding,fenster.y+padding,fenster.w-(2*padding),fenster.h-(2*padding));
-	fill("Yellow");
+	rect(fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
 
-	image(lamp,-10,edge-300,  imgSize/3, imgSize/2);
-	image(ball, 3*width/7+10, edge-50, imgSize/9, imgSize/9)
-	image(bed, 30, edge-190);
-	image(bonsai, width/2, edge-200, imgSize/3, imgSize/3);
-	image(desk, 3*width/4,edge-220, imgSize/2, imgSize/2);
-	image(chair, 3*width/5,edge-220, imgSize/3, imgSize/2);
-	image(laptop, 1060,edge-260, imgSize/5, imgSize/8);
-	image(shelf, width/2,height/5, imgSize/3, imgSize/4);
-	image(counter, width/11,2*height/3, 3*imgSize/4, imgSize/4);
-	image(wecker, width/11,2*height/3-40, imgSize/9, imgSize/8);
+	imageMode(CENTER);
+	image(lamp, i_lamp.x, i_lamp.y,i_lamp.w,i_lamp.h)
+	image(ball, i_ball.x, i_ball.y,i_ball.w,i_ball.h)
+	image(bed, i_bed.x, i_bed.y,i_bed.w,i_bed.h)
+	image(bonsai, i_bonsai.x, i_bonsai.y,i_bonsai.w,i_bonsai.h)
+	image(desk, i_desk.x, i_desk.y,i_desk.w,i_desk.h)
+	image(chair, i_chair.x, i_chair.y,i_chair.w,i_chair.h)
+	image(laptop, i_laptop.x, i_laptop.y,i_laptop.w,i_laptop.h)
+	image(board, i_board.x, i_board.y, i_board.w, i_board.h);
+	image(shelf, i_shelf.x, i_shelf.y, i_shelf.w, i_shelf.h);
+	image(counter, i_counter.x, i_counter.y, i_counter.w, i_counter.h);
+}
+
+function drawSchedule(){
+	var startingX = 200, 
+	startingY = 120, 
+	w = 30,
+	wMargin = 10, 
+	tSchedule = "Schedule: ", 
+	tSleep = "Sleep",
+	cSleep = "MidnightBlue", // RoyalBlue 
+	cSleepHighlight = "RoyalBlue",
+	tWork = "Work",
+	cWork = "Orange",
+	cWorkHighlight = "Gold",
+	tRecreation = "Recreation",
+	cRecreation = "LimeGreen", //Lime
+	cRecreationHighlight = "Lime"; //Lime
 	
-	// get light, darken room
-	let c = color('hsba(180, 100%, 0%,' + 0.80*(1-season(getSunHeight())/100)+ ')');
+	strokeWeight(0);
+	stroke(0);
+	fill(0);
+	textFont(fontRegular);
+	textSize(w);
+	textAlign(LEFT, BASELINE);
+	text(tSchedule, startingX, startingY-(w/2));
+	
+	var currX = startingX + textWidth(tSchedule) + 40;
+	
+	strokeWeight(1);
+	currX = drawScheduleElement(currX, startingY, w, wMargin, cSleep, cSleepHighlight, tSleep);
+	currX = drawScheduleElement(currX, startingY, w, wMargin, cWork, cWorkHighlight, tWork);
+	drawScheduleElement(currX, startingY, w, wMargin, cRecreation, cRecreationHighlight, tRecreation);
+	
+	textSize(w/2);
+	textAlign(CENTER, CENTER);
+	strokeWeight(1);
+	stroke("black");
+	for(var i = 0; i < 24; i++){
+		switch (daySchedule[i]) {
+			case "Sleep":
+				fill(cSleep);
+			break;
+			case "Work":
+				fill(cWork);
+			break;
+			case "Recreation":
+				fill(cRecreation);
+			break;
+			default:
+				fill(250);
+		}
+		rect(startingX + (i * w), startingY, w, w);
+		fill("white");
+		text(i, startingX + (i * w) + w/2, startingY + w/2);
+	}
+}
+
+
+
+function drawScheduleElement(currX, startingY, w, wMargin, c, cH, t){
+	var rectY = startingY - (w+10)
+	if(mouseInside(currX, rectY, w,w)) {
+		fill(cH);
+
+	} else {
+		fill(c);
+	}
+	rect(currX, rectY, w, w)
+	currX = currX + w + wMargin;
+	fill(c);
+	text(t, currX, startingY-(w/2));
+	return currX + textWidth(t) + wMargin;
+}
+
+function mouseInside(x, y, w, h){
+	if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
+	 return true; 
+	} else {
+	 return false; 
+	}
+   }
+
+function darkenRoom(){
+	// get light, darken room, TODO move to different function
+	let c = color('hsba(180, 100%, 0%,' + 0.80 * (1 - season(getSunHeight()) / 100) + ')');
 	fill(c)
 	rect(0,0,width, height);
 }
@@ -200,7 +371,7 @@ function drawSunCicle() {
 	sunColor = color('hsb(45, 10%,' + season(sunHeight) + '%)');
 	fill(sunColor);
 	noStroke();
-	circle(300,(height+cos(timeCounter) * 500),300);
+	circle(300, (height + cos(timeCounter) * 500), 300);
 }
 
 // day starts at 0:00, sun should be lowest
@@ -215,10 +386,13 @@ function debugDisplay() {
 	fill(200);
 	textFont(fontRegular);
 	textSize(tSize);
+	textAlign(LEFT, BASELINE);
 	text("FPS: " + fpsShow, 10, tSize * p++);
 	text("FNr: " + frameCounter % FRAMES_PER_SEC, 10, tSize * p++);
 	text("d%: " + round(1000 * timeCounterRelative) / 1000, 10, tSize * p++);
 	text("SH: " + round(100 * getSunHeight()) / 100, 10, tSize * p++);
+
+	print(mouseX, mouseY);
 }
 
 function updateDelta() {
