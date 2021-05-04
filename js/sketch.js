@@ -32,7 +32,7 @@ const col_main = "#40752D",
 
 // settings
 var gameSpeed = 1,
-	season = SPRING,
+	season = SUMMER,
 	debug = true, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
 
@@ -111,6 +111,7 @@ function setup() {
 	frameRate(FRAMES_PER_SEC);
 
 	loadControls();
+	loadClock();
 }
 
 function draw() {
@@ -119,6 +120,7 @@ function draw() {
 	//drawAllClouds();
 	drawInterior();
 	drawSchedule();
+	clock();
 	drawOutline();
 	if (debug) {
 		debugDisplay();
@@ -151,6 +153,24 @@ function loadControls() {
 	fastest.elt.draggable = false;
 	fastest.elt.name = "fastest";
 	fastest.elt.speed = 4;
+}
+
+function loadClock() {
+	let xPos = 800, yPos = 400, dim = 40;
+
+	let divClock = createDiv();
+	divClock.class('clock');
+	let divHour = createSpan();
+	divHour.class('hour');
+	let divMinute = createSpan();
+	divMinute.class('minute');
+	let divDot = createSpan();
+	divDot.class('dot');
+	
+	divHour.parent(divClock);
+	divMinute.parent(divClock);
+	divDot.parent(divClock);
+	divClock.position(xPos, yPos).size(dim,dim);
 }
 
 function controlsEventHandler(event) {
@@ -475,4 +495,12 @@ function SeedRandom(state1, state2) {
 		return (state1 + state2) % limit
 	}
 	return random
+}
+
+function clock() {
+	var currentMins = floor(map(timeCounterRelative, 0,1,0,1440));
+	const hour = ((floor(currentMins / 60) + 11) % 12 + 1) * 30;
+	const minute = floor(currentMins % 60) * 6;
+	document.querySelector('.hour').style.transform = `rotate(${hour}deg)`;
+	document.querySelector('.minute').style.transform = `rotate(${minute}deg)`;
 }
