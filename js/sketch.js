@@ -5,7 +5,7 @@
 
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
-	lamp = loadImage('img/lamp-575998_640.png');
+	/*lamp = loadImage('img/lamp-575998_640.png');
 	ball = loadImage('img/basketball-155997_640.png');
 	bed = loadImage('img/bed-575800_640.png');
 	bonsai = loadImage('img/bonsai-154570_640.png');
@@ -16,8 +16,7 @@ function preload() {
 	counter = loadImage('img/counter-576093_640.png');
 	wecker = loadImage('img/clock-1293099_640.png');
 	monitor = loadImage('img/monitor-2026552_640.png');
-	board = loadImage('img/whiteboard-3205371_640.png');
-
+	board = loadImage('img/whiteboard-3205371_640.png');*/
 }
 
 function setup() {
@@ -28,13 +27,18 @@ function setup() {
 	loadIndicators()
 	loadClock();
 	loadSchedule();
+	loadInterior();
+}
+
+function bla(){
+	print("test")
 }
 
 function draw() {
 	updateDelta();
 	drawSunCicle();
 	//drawAllClouds();
-	drawInterior();
+	drawRoom();
 	updateClock();
 	darkenRoom();
 	//drawSchedule();
@@ -46,26 +50,26 @@ function draw() {
 }
 
 function loadControls() {
-	var xPos = 1000, p = 0, dim = 40;
-	pause = createImg('img/pause.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	var xPos = 1000, yPos = 110, p = 0, dim = 40;
+	pause = createImg('img/pause.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	pause.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	pause.elt.draggable = false;
 	pause.elt.name = "pause";
 	pause.elt.speed = 0;
 
-	play = createImg('img/play.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	play = createImg('img/play.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	play.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	play.elt.draggable = false;
 	play.elt.name = "play";
 	play.elt.speed = 1;
 
-	faster = createImg('img/faster.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	faster = createImg('img/faster.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	faster.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	faster.elt.draggable = false;
 	faster.elt.name = "faster";
 	faster.elt.speed = 2;
 
-	fastest = createImg('img/fastest.png').position(xPos + (dim * 1.5 * p++), 100).size(dim, dim);
+	fastest = createImg('img/fastest.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	fastest.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	fastest.elt.draggable = false;
 	fastest.elt.name = "fastest";
@@ -140,8 +144,7 @@ function drawOutline() {
 	rect(0, height - 30, width, height);
 }
 
-let testi;
-function drawInterior() {
+function drawRoom() {
 	noStroke();
 	// wall
 	fill("SandyBrown");
@@ -150,26 +153,32 @@ function drawInterior() {
 	fill("Khaki");
 	rect(0, edge, width, height - edge);
 	// window
-	fill("brown");
+	fill("Brown");
 	rect(fenster.x, fenster.y, fenster.w, fenster.h);
 	fill(skyColor);
 	rect(fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
+	// ceiling
+	fill("Khaki");
+	rect(0, height - edge, width, -edge);
+	
 
-	imageMode(CENTER);
-	image(lamp, i_lamp.x, i_lamp.y, i_lamp.w, i_lamp.h)
-	image(ball, i_ball.x, i_ball.y, i_ball.w, i_ball.h)
-	image(bed, i_bed.x, i_bed.y, i_bed.w, i_bed.h)
-	image(bonsai, i_bonsai.x, i_bonsai.y, i_bonsai.w, i_bonsai.h)
-	image(desk, i_desk.x, i_desk.y, i_desk.w, i_desk.h)
-	image(chair, i_chair.x, i_chair.y, i_chair.w, i_chair.h)
-	image(laptop, i_laptop.x, i_laptop.y, i_laptop.w, i_laptop.h)
-	image(board, i_board.x, i_board.y, i_board.w, i_board.h);
-	image(shelf, i_shelf.x, i_shelf.y, i_shelf.w, i_shelf.h);
-	image(counter, i_counter.x, i_counter.y, i_counter.w, i_counter.h);
+}
+
+function loadInterior(){
+	lamp = createImg('img/lamp-575998_640.png').position(i_lamp.x, i_lamp.y).size(i_lamp.w, i_lamp.h);
+	ball = createImg('img/basketball-155997_640.png').position(i_ball.x, i_ball.y).size(i_ball.w, i_ball.h);
+	bed = createImg('img/bed-575800_640.png').position(i_bed.x, i_bed.y).size(i_bed.w, i_bed.h);
+	bonsai = createImg('img/bonsai-154570_640.png').position(i_bonsai.x, i_bonsai.y).size(i_bonsai.w, i_bonsai.h);
+	desk = createImg('img/desk-575953_640.png').position(i_desk.x, i_desk.y).size(i_desk.w, i_desk.h);
+	chair = createImg('img/office-chair-575881_640.png').position(i_chair.x, i_chair.y).size(i_chair.w, i_chair.h);
+	laptop = createImg('img/computer-156583_640.png').position(i_laptop.x, i_laptop.y).size(i_laptop.w, i_laptop.h);
+	shelf = createImg('img/shelf-159852_640.png').position(i_shelf.x, i_shelf.y).size(i_shelf.w, i_shelf.h);
+	counter = createImg('img/counter-576093_640.png').position(i_counter.x, i_counter.y).size(i_counter.w, i_counter.h);
+	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
 }
 
 function loadIndicators() {
-	var xPos = 20, yPos = 180, dim = 50, p = 0;
+	var xPos = 20, yPos = 220, dim = 50, p = 0;
 
 	i_light = createImg('img/light-156054_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
 	i_light.elt.draggable = false;
@@ -183,14 +192,14 @@ function loadIndicators() {
 
 let brightness = 0, currMelatonin = 0.4;
 function drawIndicators() {
-	var xPos = 20, yPos = 180, dim = 50, maxW = 150, p = 0;
+	var xPos = 20, yPos = 220, dim = 50, maxW = 150, p = 0;
 	let energyBar, melatoninBar, light;
 
 	noStroke();
 	fill(250);
 
-	var startingX = 200,
-		startingY = 120,
+	var startingX = 40,
+		startingY = 130,
 		w = 30;
 
 	rect(map(timeCounterRelative, 0, 1, startingX, startingX + (24 * w)), startingY + w, 5, 10);
@@ -213,41 +222,40 @@ function drawIndicators() {
 		currMelatonin = max(0, currMelatonin);
 	}
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currMelatonin, 0, 1, 0, maxW), dim - 20);
-
-
 }
 
 let divSleepBox, divWorkBox, divRecreationBox;
 function loadSchedule() {
-	var startingX = 200,
-		startingY = 120,
+	var startingX = 40,
+		startingY = 130,
 		w = 30;
 
 	let divScheduleText = createDiv("Schedule:").position(startingX, 78);
 	divScheduleText.addClass('scheduleText');
 
-	divSleepBox = createDiv().position(390, 80);
+	//divSleepBox = createDiv().position(390, 80);
+	divSleepBox = createDiv().position(230, 80);
 	divSleepBox.addClass('scheduleBox').addClass('sleep').addClass('sleep_selector');
 	divSleepBox.elt.name = "Sleep";
 	divSleepBox.elt.type = "select";
 
-	let divSleepText = createDiv("Sleep").position(390 + w + 10, 78);
+	let divSleepText = createDiv("Sleep").position(230 + w + 10, 78);
 	divSleepText.addClass('scheduleText').addClass('sleep');
 
-	divWorkBox = createDiv().position(525, 80);
+	divWorkBox = createDiv().position(365, 80);
 	divWorkBox.addClass('scheduleBox').addClass('work').addClass('work_selector');
 	divWorkBox.elt.name = "Work";
 	divWorkBox.elt.type = "select";
 
-	let divWorkText = createDiv("Work").position(525 + w + 10, 78);
+	let divWorkText = createDiv("Work").position(365 + w + 10, 78);
 	divWorkText.addClass('scheduleText').addClass('work');
 
-	divRecreationBox = createDiv().position(650, 80);
+	divRecreationBox = createDiv().position(490, 80);
 	divRecreationBox.addClass('scheduleBox').addClass('recreation').addClass('recreation_selector');
 	divRecreationBox.elt.name = "Recreation";
 	divRecreationBox.elt.type = "select";
 
-	let divRecreationText = createDiv("Recreation").position(650 + w + 10, 78);
+	let divRecreationText = createDiv("Recreation").position(490 + w + 10, 78);
 	divRecreationText.addClass('scheduleText').addClass('recreation');
 
 	divSleepBox.mouseReleased(scheduleClickListener);
