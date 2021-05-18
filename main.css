@@ -1,144 +1,179 @@
 @font-face {
-	font-family: 'Poppins';
-	src:
-		url('res/Poppins-Regular.ttf')
+  font-family: "Poppins";
+  src: url("res/Poppins-Regular.ttf");
 }
 
 body {
-	background: #404040;
-	display: inline-block;
-	margin: 0px auto;
+  background: #404040;
+  display: inline-block;
+  margin: 0px auto;
 }
 
-.shadow{
-	-webkit-box-shadow: 5px 5px 10px #666;
-	box-shadow: 5px 5px 10px #666;
+.shadow {
+  -webkit-box-shadow: 5px 5px 10px #666;
+  box-shadow: 5px 5px 10px #666;
 }
 
-.selected{
-	-webkit-box-shadow: 5px 5px 10px #326;
-	box-shadow: 5px 5px 10px #326; 
+.selected {
+  -webkit-box-shadow: 5px 5px 10px #326;
+  box-shadow: 5px 5px 10px #326;
 }
 
 .clock {
-	width: 100px;
-	height: 100px;
+  width: 100px;
+  height: 100px;
 
-	position: absolute;
-	top: 50px;
-	right: 50px;
-	
-	border-radius: 100%;
-	background: #ddd;
-	border: 5px solid #ddd;
-	box-shadow: inset 2px 3px 8px 0 rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 50px;
+  right: 50px;
+
+  border-radius: 100%;
+  background: #ddd;
+  border: 5px solid #ddd;
+  box-shadow: inset 2px 3px 8px 0 rgba(0, 0, 0, 0.1);
 }
 
 .minute,
 .hour {
-	position: absolute;
-	height: 28%;
-	width: 2%;
-	margin: auto;
-	top: -27%;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background: black;
-	transform-origin: bottom center;
-	transform: rotate(0deg);
-	box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
-	z-index: 1;
+  position: absolute;
+  height: 28%;
+  width: 2%;
+  margin: auto;
+  top: -27%;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: black;
+  transform-origin: bottom center;
+  transform: rotate(0deg);
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
+  z-index: 1;
 }
 
 .minute {
-	position: absolute;
-	height: 37%;
-	width: 1%;
-	top: -38%;
-	left: 0;
-	box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
-	transform: rotate(90deg);
+  position: absolute;
+  height: 37%;
+  width: 1%;
+  top: -38%;
+  left: 0;
+  box-shadow: 0 0 1px 0 rgba(0, 0, 0, 0.4);
+  transform: rotate(90deg);
 }
 
 .dot {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 2%;
-	height: 2%;
-	border-radius: 30%;
-	background: white;
-	border: 2px solid #1b1b1b;
-	border-radius: 30%;
-	margin: auto;
-	z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 2%;
+  height: 2%;
+  border-radius: 30%;
+  background: white;
+  border: 2px solid #1b1b1b;
+  border-radius: 30%;
+  margin: auto;
+  z-index: 1;
 }
 
 .scheduleBox {
-	width: 30px;
-	height: 30px;
-	border: solid 1px black;
-	margin: 0px;
-	font-family: Poppins;
-	text-align: center;
-	vertical-align: middle;
-	line-height: 30px;
-	-webkit-user-select: none; /* Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+/Edge */
-	user-select: none; /* Standard */
-	z-index: 1;
+  width: 30px;
+  height: 30px;
+  border: solid 1px black;
+  margin: 0px;
+  font-family: Poppins;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 30px;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+  z-index: 1;
 }
 
 .scheduleText {
-	font-family: Poppins;
-	font-size: 25px;
-	color: black;
-	-webkit-text-stroke: 1px black;
-	-webkit-user-select: none; /* Safari */        
-	-moz-user-select: none; /* Firefox */
-	-ms-user-select: none; /* IE10+/Edge */
-	user-select: none; /* Standard */
-	z-index: 1;
+  font-family: Poppins;
+  font-size: 25px;
+  color: black;
+  -webkit-text-stroke: 1px black;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+  z-index: 1;
 }
 
 .scheduleText.sleep {
-	color: midnightblue;
+  color: midnightblue;
 }
 
 .scheduleText.work {
-	color: orange;
+  color: orange;
 }
 
 .scheduleText.recreation {
-	color: limegreen;
+  color: limegreen;
 }
 
 .scheduleBox.sleep {
-	background-color: midnightblue;
+  background-color: midnightblue;
 }
 
 .scheduleBox.sleep_selector:hover {
-	background-color: royalblue;
+  background-color: royalblue;
 }
 
-
 .scheduleBox.work {
-	background-color: orange;
+  background-color: orange;
 }
 
 .scheduleBox.work_selector:hover {
-	background-color: gold;
+  background-color: gold;
 }
 
 .scheduleBox.recreation {
-	background-color: limegreen;
+  background-color: limegreen;
 }
 
 .scheduleBox.recreation_selector:hover {
-	background-color: lime;
+  background-color: lime;
 }
 
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: rgb(201, 201, 201);
+  color: rgb(20, 20, 20);
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 10;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgb(201, 201, 201) transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}

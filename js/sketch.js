@@ -177,10 +177,13 @@ function loadInterior(){
 	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
 }
 
+
 function loadIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, p = 0;
 
-	i_light = createImg('img/light-156054_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
+	let container_light = createDiv().addClass("tooltip").position(xPos, yPos + (dim * 1.2 * p++));
+	i_light = createImg('img/light-156054_640.png').size(dim, dim).parent(container_light);
+	createSpan('Lorem ipsum dolor sit amet').addClass("tooltiptext").parent(container_light);
 	i_light.elt.draggable = false;
 
 	i_melatonin = createImg('img/melatonin.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
@@ -276,16 +279,6 @@ function loadSchedule() {
 
 var clickTarget, scheduleTargetName, scheduleInteraction = false, snu;
 function scheduleClickListener(e) {
-	// bug related to text inside of the box
-	/*print(e)
-	let el;
-	snu = e;
-	if(e.explicitOriginalTarget.childNodes.length == 0){
-		el = e.explicitOriginalTarget.parentElement;
-	} else {
-		el = e.explicitOriginalTarget;
-	}
-	print(el)*/
 
 	el = e.explicitOriginalTarget;
 	let left = el.style.left.match(/\d/g).join('');
@@ -321,10 +314,6 @@ function mouseReleased() {
 	} else {
 		scheduleInteraction = false;
 		scheduleTargetName = undefined;
-		/*
-		divSleepBox.elt.classList.remove("selected");
-		divWorkBox.elt.classList.remove("selected");
-		divRecreationBox.elt.classList.remove("selected");*/
 	}
 }
 
