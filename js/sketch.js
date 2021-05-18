@@ -20,7 +20,7 @@ function preload() {
 }
 
 
-var infoBox;
+var infoBox, infoBoxCloser;
 function setup() {
 	createCanvas(1280, 800);
 	frameRate(FRAMES_PER_SEC);
@@ -32,7 +32,8 @@ function setup() {
 	loadInterior();
 	//110,210   1170,750
 	infoBox = createDiv().addClass("infoBox").position(110,210).size(1060, 520);
-	createSpan("X").id("infoCloser").addClass("infoCloser").parent(infoBox).mouseReleased(function(){infoBox.toggleClass("show");});
+	infoBoxCloser = createSpan("X").id("infoCloser").addClass("infoCloser").mouseReleased(function(){infoBox.toggleClass("show");});
+	showInfoBox(infoBoxGameInfo);
 }
 
 function draw() {
@@ -76,7 +77,7 @@ function loadControls() {
 	fastest.elt.name = "fastest";
 	fastest.elt.speed = 4;
 
-	play.elt.classList.toggle("selected");
+	pause.elt.classList.toggle("selected");
 }
 
 function controlsEventHandler(event) {
@@ -180,6 +181,9 @@ function loadInterior(){
 	shelf.mouseOver(glow).mouseOut(glow);
 	counter = createImg('img/counter-576093_640.png').position(i_counter.x, i_counter.y).size(i_counter.w, i_counter.h);
 	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
+	postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
+	postit.mouseOver(pulse).mouseOut(pulse);
+
 }
 
 function pulse(event) {
@@ -205,9 +209,32 @@ function glow(event) {
 }
 
 function showLightInfo(){
-	print("BEHOLD");
+	showInfoBox(infoBoxLight);
+}
+
+function showMelatoninInfo(){
+	showInfoBox(infoBoxMelatonin);
+}
+
+function showEnergyInfo(){
+	showInfoBox(infoBoxEnergy);
+}
+
+function showHealthInfo(){
+	showInfoBox(infoBoxHealth);
+}
+
+function showScheduleInfo(){
+	showInfoBox(infoBoxSchedule);
+}
+
+function showInfoBox(content){
+	infoBox.html("");
+	infoBoxCloser.parent(infoBox);
+	infoBox.html(content, true);
 	infoBox.toggleClass("show");
 }
+
 
 function loadIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, p = 0;
@@ -217,12 +244,17 @@ function loadIndicators() {
 	i_light.elt.draggable = false;
 
 	i_melatonin = createImg('img/melatonin.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_melatonin.mouseOver(pulse).mouseOut(pulse).mouseReleased(showLightInfo);
+	i_melatonin.mouseOver(pulse).mouseOut(pulse).mouseReleased(showMelatoninInfo);
 	i_melatonin.elt.draggable = false;
 
 	i_energy = createImg('img/battery-151574_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_energy.mouseOver(pulse).mouseOut(pulse).mouseReleased(showLightInfo);
+	i_energy.mouseOver(pulse).mouseOut(pulse).mouseReleased(showEnergyInfo);
 	i_energy.elt.draggable = false;
+
+	i_heart = createImg('img/heart-1297159_640_res.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
+	i_heart.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHealthInfo);
+	i_heart.elt.draggable = false;
+
 }
 
 let brightness = 0, currMelatonin = 0.4;
@@ -242,11 +274,12 @@ function drawIndicators() {
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	p = 0;
 	fill("yellow");
 	brightness = 0.90 * season(getSunHeight());
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
-	fill("cyan");
+	fill("aquamarine");
 	var mD = map(brightness, 0, 100, 0.005, -0.005);
 	if (gameSpeed != 0) {
 		currMelatonin += mD;
@@ -254,6 +287,12 @@ function drawIndicators() {
 		currMelatonin = max(0, currMelatonin);
 	}
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currMelatonin, 0, 1, 0, maxW), dim - 20);
+
+	//placeholder
+	fill("navy");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
+	fill("maroon");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
 }
 
 let divSleepBox, divWorkBox, divRecreationBox;
@@ -263,7 +302,7 @@ function loadSchedule() {
 		w = 30;
 
 	let divScheduleText = createDiv("Schedule:").position(startingX, 78);
-	divScheduleText.mouseOver(pulse).mouseOut(pulse);
+	divScheduleText.mouseOver(pulse).mouseOut(pulse).mouseReleased(showScheduleInfo);
 	divScheduleText.addClass('scheduleText');
 
 	divSleepBox = createDiv().position(230, 80);

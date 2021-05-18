@@ -26,7 +26,7 @@ const col_main = "#40752D",
 	col_main_lightest = "#ECF4E9";
 
 // settings
-var gameSpeed = 1,
+var gameSpeed = 0,
 	season = SUMMER,
 	debug = false, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
@@ -54,7 +54,7 @@ var fontRegular;
 var pause, play, faster, fastest;
 
 // indicators
-var i_energy, i_light, i_melatonin;
+var i_energy, i_light, i_melatonin, i_heart;
 
 const imgSize = 640;
 var edge = 600, padding = 10;
@@ -198,4 +198,17 @@ const fenster = {
 	y: 590,
 	w: 300,
 	h: 80
+}, i_postit = {
+	x: 1030,
+	y: 370,
+	w: 40,
+	h: 40
 };
+
+var infoBoxLongFiller = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod temporiii incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+infoBoxGameInfo = "<b>SLEEP GAME</b><br> Simulate your Day-Night! Organize your day in order to stay energetic and healthy.",
+infoBoxLight = "<b>Light</b><br> When eyes receive light from the sun, the pineal gland's production of melatonin is inhibited and the hormones produced keep the human awake. When the eyes do not receive light, melatonin is produced in the pineal gland and the human becomes tired.",
+infoBoxMelatonin = "<b>Melatonin</b><br> Melatonin is a hormone primarily released by the pineal gland at night, and has long been associated with control of the sleep–wake cycle.",
+infoBoxEnergy = "<b>Energy</b><br> This indicator displays your current energy level. A full bar means you have plenty of energy to spare for the tasks of the day such as programming a game about sleep. A low bar means you are very tired and should go to sleep. Staying awake for extended periods of time on end can have negative effects on your health!",
+infoBoxHealth = "<b>Health</b><br> Sleep has a direct effect on your health! Sleep plenty to stay healthy. Not sleeping enough can make you sick as your body has a no time regenerate and fight off diseases. Not sleeping for several days can even be fatal!",
+infoBoxSchedule = "<b>Schedule</b><br> This is your schedule. It shows your daily routine in hourly segments starting at 0 (the first hour of the day) and ending at 23. You can adjust it by clicking on the colored boxes next to an activity and then clicking in the position in the schedule."

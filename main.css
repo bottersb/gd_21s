@@ -10,13 +10,11 @@ body {
 }
 
 .shadow {
-  -webkit-box-shadow: 5px 5px 10px #666;
-  box-shadow: 5px 5px 10px #666;
+	filter: drop-shadow(0 0 10px #666);
 }
 
 .selected {
-  -webkit-box-shadow: 5px 5px 10px #326;
-  box-shadow: 5px 5px 10px #326;
+  filter: drop-shadow(0 0 10px rgb(0, 255, 157));
 }
 
 .clock {
@@ -142,7 +140,7 @@ body {
 
 .glow {
   filter: drop-shadow(0 0 25px rgb(0, 255, 0, 1));
-  animation: glow 1s infinite;
+  animation: glow 1.5s infinite;
 }
 
 @keyframes glow {
@@ -161,6 +159,7 @@ body {
   box-shadow: 0 0 10px rgba(204, 44, 44, 0.4);
   border-radius: 50%;
   animation: pulse 1.5s infinite;
+  z-index: 10;
 }
 
 @-webkit-keyframes pulse {
@@ -195,7 +194,7 @@ body {
   font-family: Poppins;
   font-size: 25px;
   color: black;
-  visibility: visible;
+  visibility: hidden;
   background-color: whitesmoke;
   z-index: 50;
   overflow-y: auto;
@@ -204,7 +203,7 @@ body {
 }
 
 .infoBox.show {
-	visibility: hidden;
+	visibility: visible;
 }
 
 .infoCloser{
