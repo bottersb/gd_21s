@@ -28,7 +28,7 @@ const col_main = "#40752D",
 // settings
 var gameSpeed = 1,
 	season = SUMMER,
-	debug = true, // verbose output and display
+	debug = false, // verbose output and display
 	debugUpdateDelay = FRAMES_PER_SEC / 3; // in frames
 
 var speedLimit = true, // fps upper limit to defined value of FRAMES_PER_SEC
@@ -149,12 +149,12 @@ const fenster = {
 	w: 250,
 	h: 150
 }, i_ball = {
-	x: 600,
+	x: 1050,
 	y: 570,
 	w: 50,
 	h: 50
 }, i_lamp = {
-	x: 250,
+	x: 580,
 	y: 490,
 	w: 100,
 	h: 140

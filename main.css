@@ -140,40 +140,77 @@ body {
   background-color: lime;
 }
 
-.tooltip {
-  position: relative;
-  display: inline-block;
+.glow {
+  filter: drop-shadow(0 0 25px rgb(0, 255, 0, 1));
+  animation: glow 1s infinite;
 }
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 120px;
-  background-color: rgb(201, 201, 201);
-  color: rgb(20, 20, 20);
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 10;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -60px;
-  opacity: 0;
-  transition: opacity 0.3s;
+@keyframes glow {
+  0% {
+    filter: drop-shadow(0 0 0 rgb(0, 255, 0, 1));
+  }
+  70% {
+    filter: drop-shadow(0 0 25px rgba(0, 255, 0, 0));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(0, 255, 0, 0));
+  }
 }
 
-.tooltip .tooltiptext::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: rgb(201, 201, 201) transparent transparent transparent;
+.pulse {
+  box-shadow: 0 0 10px rgba(204, 44, 44, 0.4);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
 }
 
-.tooltip:hover .tooltiptext {
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba(204, 44, 44, 0.4);
+  }
+  70% {
+    -webkit-box-shadow: 0 0 0 10px rgba(204, 44, 44, 0);
+  }
+  100% {
+    -webkit-box-shadow: 0 0 0 0 rgba(204, 44, 44, 0);
+  }
+}
+@keyframes pulse {
+  0% {
+    -moz-box-shadow: 0 0 0 0 rgba(204, 44, 44, 0.4);
+    box-shadow: 0 0 0 0 rgba(204, 44, 44, 0.4);
+  }
+  70% {
+    -moz-box-shadow: 0 0 0 10px rgba(204, 44, 44, 0);
+    box-shadow: 0 0 0 10px rgba(204, 44, 44, 0);
+  }
+  100% {
+    -moz-box-shadow: 0 0 0 0 rgba(204, 44, 44, 0);
+    box-shadow: 0 0 0 0 rgba(204, 44, 44, 0);
+  }
+}
+
+.infoBox {
+  border-radius: 5px;
+  padding: 10px;
+  font-family: Poppins;
+  font-size: 25px;
+  color: black;
   visibility: visible;
-  opacity: 1;
+  background-color: whitesmoke;
+  z-index: 50;
+  overflow-y: auto;
+  display: block;
+  border: solid 2px black;
+}
+
+.infoBox.show {
+	visibility: hidden;
+}
+
+.infoCloser{
+	float: right;
+    display:inline-block;
+    padding:2px 5px;
+    background:#ccc;
+	cursor: pointer;
 }
