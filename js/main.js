@@ -39,7 +39,8 @@ var speedLimit = true, // fps upper limit to defined value of FRAMES_PER_SEC
 var frameCounter = 0, // frame counter, integer increased each tick
 	fpsShow = 0, // buffered value for delay	
 	timeCounter = 0, // current day time normalized to distance on unit circle
-	timeCounterRelative = 0, // percent of full day 
+	timeCounterRelative = 0, // percent of full day
+	dayNr = 0;
 	fpsNow = 0, // true time since last frame may vary and therefore the fps
 	then = Date.now(), // time reference for deltaT
 	deltaT = 0; // progress in ms since last frame
@@ -58,7 +59,7 @@ var i_energy, i_light, i_melatonin, i_heart;
 
 const imgSize = 640;
 var edge = 600, padding = 10;
-var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board;
+var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board, ceilingLamp;
 
 var dailySchedule = [
 	"Sleep",
@@ -203,10 +204,15 @@ const fenster = {
 	y: 370,
 	w: 40,
 	h: 40
+}, i_ceilingLamp = {
+	x: 830,
+	y: 170,
+	w: 80,
+	h: 90
 };
 
 var infoBoxLongFiller = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod temporiii incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-infoBoxGameInfo = "<b>SLEEP GAME</b><br> Simulate your Day-Night! Organize your day in order to stay energetic and healthy.",
+infoBoxGameInfo = "<b>SLEEP GAME</b><br> Simulate your Day-Night! Organize your day in order to stay energetic and healthy. Sleep is a naturally recurring state of mind and body, characterized by altered consciousness, relatively inhibited sensory activity, reduced muscle activity and inhibition of nearly all voluntary muscles during rapid eye movement (REM) sleep, and reduced interactions with surroundings.",
 infoBoxLight = "<b>Light</b><br> When eyes receive light from the sun, the pineal gland's production of melatonin is inhibited and the hormones produced keep the human awake. When the eyes do not receive light, melatonin is produced in the pineal gland and the human becomes tired.",
 infoBoxMelatonin = "<b>Melatonin</b><br> Melatonin is a hormone primarily released by the pineal gland at night, and has long been associated with control of the sleep–wake cycle.",
 infoBoxEnergy = "<b>Energy</b><br> This indicator displays your current energy level. A full bar means you have plenty of energy to spare for the tasks of the day such as programming a game about sleep. A low bar means you are very tired and should go to sleep. Staying awake for extended periods of time on end can have negative effects on your health!",

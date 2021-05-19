@@ -10,7 +10,7 @@ body {
 }
 
 .shadow {
-	filter: drop-shadow(0 0 10px #666);
+  filter: drop-shadow(0 0 10px #666);
 }
 
 .selected {
@@ -141,6 +141,7 @@ body {
 .glow {
   filter: drop-shadow(0 0 25px rgb(0, 255, 0, 1));
   animation: glow 1.5s infinite;
+  cursor: pointer;
 }
 
 @keyframes glow {
@@ -160,6 +161,7 @@ body {
   border-radius: 50%;
   animation: pulse 1.5s infinite;
   z-index: 10;
+  cursor: pointer;
 }
 
 @-webkit-keyframes pulse {
@@ -203,13 +205,42 @@ body {
 }
 
 .infoBox.show {
-	visibility: visible;
+  visibility: visible;
 }
 
-.infoCloser{
-	float: right;
-    display:inline-block;
-    padding:2px 5px;
-    background:#ccc;
-	cursor: pointer;
+.infoCloser {
+  float: right;
+  display: inline-block;
+  padding: 2px 5px;
+  background: #ccc;
+  cursor: pointer;
+}
+
+.clock .tooltiptext {
+  visibility: hidden;
+  width: 150px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+.clock .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.clock:hover .tooltiptext {
+  visibility: visible;
 }

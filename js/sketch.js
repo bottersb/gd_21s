@@ -183,7 +183,8 @@ function loadInterior(){
 	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
 	postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
 	postit.mouseOver(pulse).mouseOut(pulse);
-
+	ceilingLamp = createImg('img/lights-576011_640.png').position(i_ceilingLamp.x, i_ceilingLamp.y).size(i_ceilingLamp.w, i_ceilingLamp.h);
+	
 }
 
 function pulse(event) {
@@ -254,8 +255,35 @@ function loadIndicators() {
 	i_heart = createImg('img/heart-1297159_640_res.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
 	i_heart.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHealthInfo);
 	i_heart.elt.draggable = false;
-
 }
+
+
+/*
+Health = 96 units
+
+When energy reaches zero, health decreases, when energy is full health will increase.
+Health will last for 4 days, 4*24 units.
+
+Full Energy = 16 units
+Sleep = 2 energy 
+Work = -1 energy
+Recreation = -1/3 energy
+
+"Normal" workday will have 10 hours of work and 6 hours of recreation,
+which will exert exactly 3/4 of energy: 12 = 10*1 + 6*1/3
+
+if melatonin is above 50%, negative energy effects will double:
+work and recreation becomes twice more exhausting
+
+if mealtonin is below 50%, postive energy effects will be havled:
+sleep becomes half as replenishing
+*/
+
+function getScheduledActivity(){
+	var index = floor(map(timeCounterRelative, 0, 1, 0, 23))
+	return dailySchedule[index];
+}
+
 
 let brightness = 0, currMelatonin = 0.4;
 function drawIndicators() {
@@ -280,6 +308,7 @@ function drawIndicators() {
 	brightness = 0.90 * season(getSunHeight());
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
 	fill("aquamarine");
+	// TODO 
 	var mD = map(brightness, 0, 100, 0.005, -0.005);
 	if (gameSpeed != 0) {
 		currMelatonin += mD;
@@ -293,6 +322,7 @@ function drawIndicators() {
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
 	fill("maroon");
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
+
 }
 
 let divSleepBox, divWorkBox, divRecreationBox;
@@ -345,16 +375,16 @@ function loadSchedule() {
 	}
 }
 
-var clickTarget, scheduleTargetName, scheduleInteraction = false;
+var clickTarget, scheduleTargetName, scheduleInteraction = false, scheduleElement;
 function scheduleClickListener(e) {
 	//el = e.explicitOriginalTarget;
-	el = e.target;
-	let left = el.style.left.match(/\d/g).join('');
+	scheduleElement = e.target;
+	let left = scheduleElement.style.left.match(/\d/g).join('');
 	left = parseInt(left, 10)
-	let top = el.style.top.match(/\d/g).join('');
+	let top = scheduleElement.style.top.match(/\d/g).join('');
 	top = parseInt(top, 10)
-	let height = el.clientHeight;
-	let width = el.clientWidth;
+	let height = scheduleElement.clientHeight;
+	let width = scheduleElement.clientWidth;
 
 	clickTarget = {
 		x: left,
@@ -363,16 +393,15 @@ function scheduleClickListener(e) {
 		h: height
 	}
 
-	let type = el.type;
+	let type = scheduleElement.type;
 	if (type == "put") {
 		if (scheduleInteraction) {
-			let element = select('#' + el.id);
+			let element = select('#' + scheduleElement.id);
 			element.class('').addClass('scheduleBox').addClass(scheduleTargetName.toLowerCase());
-			dailySchedule[el.scheduleIndex] = scheduleTargetName;
+			dailySchedule[scheduleElement.scheduleIndex] = scheduleTargetName;
 		}
 	} else {
-		//el.classList.add("selected");
-		scheduleTargetName = el.name;
+		scheduleTargetName = scheduleElement.name;
 	}
 }
 
@@ -420,7 +449,8 @@ var getSunHeight = function () {
 }
 
 function debugDisplay() {
-	let tSize = 18, xPos = 1030, yPos = 380, p = 0;
+	//let tSize = 18, xPos = 1030, yPos = 380, p = 0;
+	let tSize = 18, xPos = 30, yPos = 500, p = 0;
 	strokeWeight(2);
 	stroke(0);
 	fill(200);
@@ -444,6 +474,7 @@ function updateDelta() {
 
 	timeCounter += RAD_PER_MIN * (deltaT / TICK) * gameSpeed;
 	timeCounterRelative = (timeCounter % TWO_PI) / TWO_PI;
+	dayNr = floor(timeCounter / TWO_PI);
 
 	frameCounter += 1;
 	fpsNow = round(1000 / deltaT);
@@ -464,6 +495,7 @@ function deltaTLimiter() {
 	}
 }
 
+var clockTooltip;
 function loadClock() {
 	let xPos = 800, yPos = 400, dim = 40;
 
@@ -476,16 +508,28 @@ function loadClock() {
 	let divDot = createSpan();
 	divDot.class('dot');
 
+	clockTooltip = createSpan().addClass("tooltiptext");
+
 	divHour.parent(divClock);
 	divMinute.parent(divClock);
 	divDot.parent(divClock);
+	clockTooltip.parent(divClock);
 	divClock.position(xPos, yPos).size(dim, dim);
 }
 
+const digits = {minimumIntegerDigits: 2};
 function updateClock() {
 	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
-	const hour = ((floor(currentMins / 60) + 11) % 12 + 1) * 30;
-	const minute = floor(currentMins % 60) * 6;
-	document.querySelector('.hour').style.transform = `rotate(${hour}deg)`;
-	document.querySelector('.minute').style.transform = `rotate(${minute}deg)`;
+	var hour = floor(currentMins / 60);
+	var min = floor(currentMins % 60);
+	
+	const hourDeg = ((hour + 11) % 12 + 1) * 30;
+	const minuteDeg = min * 6;
+	clockTooltip.html("Time:\t" + hour.toLocaleString(undefined, digits) + ":" + min.toLocaleString(undefined, digits));
+	clockTooltip.html("<br>Day:\t" + dayNr, true);
+	clockTooltip.html("<br>Season:\t" + season.name, true);
+	
+	//(6).toLocaleString(undefined, {minimumIntegerDigits: 2})
+	document.querySelector('.hour').style.transform = `rotate(${hourDeg}deg)`;
+	document.querySelector('.minute').style.transform = `rotate(${minuteDeg}deg)`;
 }
