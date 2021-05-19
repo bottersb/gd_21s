@@ -345,10 +345,10 @@ function loadSchedule() {
 	}
 }
 
-var clickTarget, scheduleTargetName, scheduleInteraction = false, snu;
+var clickTarget, scheduleTargetName, scheduleInteraction = false;
 function scheduleClickListener(e) {
-
-	el = e.explicitOriginalTarget;
+	//el = e.explicitOriginalTarget;
+	el = e.target;
 	let left = el.style.left.match(/\d/g).join('');
 	left = parseInt(left, 10)
 	let top = el.style.top.match(/\d/g).join('');
