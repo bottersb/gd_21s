@@ -218,7 +218,7 @@ body {
 
 .clock .tooltiptext {
   visibility: hidden;
-  width: 150px;
+  width: 120px;
   background-color: black;
   color: #fff;
   text-align: center;

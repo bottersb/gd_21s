@@ -31,8 +31,8 @@ function setup() {
 	loadSchedule();
 	loadInterior();
 	//110,210   1170,750
-	infoBox = createDiv().addClass("infoBox").position(110,210).size(1060, 520);
-	infoBoxCloser = createSpan("X").id("infoCloser").addClass("infoCloser").mouseReleased(function(){infoBox.toggleClass("show");});
+	infoBox = createDiv().addClass("infoBox").position(110, 210).size(1060, 520);
+	infoBoxCloser = createSpan("X").id("infoCloser").addClass("infoCloser").mouseReleased(function () { infoBox.toggleClass("show"); });
 	showInfoBox(infoBoxGameInfo);
 }
 
@@ -113,9 +113,9 @@ function keyReleased() {
 			gameSpeed = 0;
 		} else {
 			gameSpeed = lastGameSpeed;
-			switch(lastGameSpeed){
+			switch (lastGameSpeed) {
 				case 1:
-					play.elt.classList.toggle("selected");	
+					play.elt.classList.toggle("selected");
 					break;
 				case 2:
 					faster.elt.classList.toggle("selected");
@@ -164,7 +164,7 @@ function drawRoom() {
 	rect(0, height - edge, width, -edge);
 }
 
-function loadInterior(){
+function loadInterior() {
 	bonsai = createImg('img/bonsai-154570_640.png').position(i_bonsai.x, i_bonsai.y).size(i_bonsai.w, i_bonsai.h);
 	ball = createImg('img/basketball-155997_640.png').position(i_ball.x, i_ball.y).size(i_ball.w, i_ball.h);
 	ball.mouseOver(glow).mouseOut(glow);
@@ -184,7 +184,7 @@ function loadInterior(){
 	postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
 	postit.mouseOver(pulse).mouseOut(pulse);
 	ceilingLamp = createImg('img/lights-576011_640.png').position(i_ceilingLamp.x, i_ceilingLamp.y).size(i_ceilingLamp.w, i_ceilingLamp.h);
-	
+
 }
 
 function pulse(event) {
@@ -209,27 +209,27 @@ function glow(event) {
 	}
 }
 
-function showLightInfo(){
+function showLightInfo() {
 	showInfoBox(infoBoxLight);
 }
 
-function showMelatoninInfo(){
+function showMelatoninInfo() {
 	showInfoBox(infoBoxMelatonin);
 }
 
-function showEnergyInfo(){
+function showEnergyInfo() {
 	showInfoBox(infoBoxEnergy);
 }
 
-function showHealthInfo(){
+function showHealthInfo() {
 	showInfoBox(infoBoxHealth);
 }
 
-function showScheduleInfo(){
+function showScheduleInfo() {
 	showInfoBox(infoBoxSchedule);
 }
 
-function showInfoBox(content){
+function showInfoBox(content) {
 	infoBox.html("");
 	infoBoxCloser.parent(infoBox);
 	infoBox.html(content, true);
@@ -257,38 +257,18 @@ function loadIndicators() {
 	i_heart.elt.draggable = false;
 }
 
-
-/*
-Health = 96 units
-
-When energy reaches zero, health decreases, when energy is full health will increase.
-Health will last for 4 days, 4*24 units.
-
-Full Energy = 16 units
-Sleep = 2 energy 
-Work = -1 energy
-Recreation = -1/3 energy
-
-"Normal" workday will have 10 hours of work and 6 hours of recreation,
-which will exert exactly 3/4 of energy: 12 = 10*1 + 6*1/3
-
-if melatonin is above 50%, negative energy effects will double:
-work and recreation becomes twice more exhausting
-
-if mealtonin is below 50%, postive energy effects will be havled:
-sleep becomes half as replenishing
-*/
-
-function getScheduledActivity(){
+function getScheduledActivity() {
 	var index = floor(map(timeCounterRelative, 0, 1, 0, 23))
 	return dailySchedule[index];
 }
 
 
-let brightness = 0, currMelatonin = 0.4;
+const maxHealth = 96, maxEnergy = 16;
+var brightness = 0, currMelatonin = 0.7, currEnergy = 6, currHealth = 96;
+var melatoninDelta = 0.008;
 function drawIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, maxW = 150, p = 0;
-	
+
 	stroke(1)
 	strokeWeight(1)
 	fill(250);
@@ -297,32 +277,88 @@ function drawIndicators() {
 		startingY = 130,
 		w = 30;
 
+	// current time on schedule
 	rect(map(timeCounterRelative, 0, 1, startingX, startingX + (24 * w)), startingY + w, 5, 10);
 
+	// empty boxes
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
+	// reset the vertical advance faktor
 	p = 0;
+
+
 	fill("yellow");
-	brightness = 0.90 * season(getSunHeight());
+	// TODO when working at night light will be used, add a value
+	brightness = 0.99 * season(getSunHeight());
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
 	fill("aquamarine");
-	// TODO 
-	var mD = map(brightness, 0, 100, 0.005, -0.005);
+
+	// melatonin
+	var mD = map(brightness, 0, 100, melatoninDelta, (-1) * melatoninDelta);
 	if (gameSpeed != 0) {
-		currMelatonin += mD;
+		currMelatonin += mD * gameSpeed;
 		currMelatonin = min(1, currMelatonin);
 		currMelatonin = max(0, currMelatonin);
 	}
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currMelatonin, 0, 1, 0, maxW), dim - 20);
 
-	//placeholder
-	fill("navy");
-	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
-	fill("maroon");
-	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
+	// energy
+	if (gameSpeed != 0) {
+		let energyPerHour, energyPerTick;
+		switch (getScheduledActivity()) {
+			case "Sleep":
+				// if you are exposed to a lot of light sleeping will be half as "good"
+				energyPerHour = currMelatonin > 0.5 ? 2 : 1;
+				energyPerTick = energyPerHour / 60;
+				currEnergy += energyPerTick * gameSpeed;
+				break;
+			case "Recreation":
+				// if you are exposed to darkness recreation will be double as exhausting
+				energyPerHour = currMelatonin < 0.5 ? -1/3 : -2/3;
+				energyPerTick = energyPerHour / 60;
+				currEnergy += energyPerTick * gameSpeed;
+				break;
+			case "Work":
+				// if you are exposed to darkness work will be double as exhausting
+				energyPerHour = currMelatonin < 0.5 ? -1 : -2;
+				energyPerTick = energyPerHour / 60;
+				currEnergy += energyPerTick * gameSpeed;
+				break;
+		}
+		// energy cannot be lower than 0 and not higher than maxEnergy
+		currEnergy = min(maxEnergy, currEnergy);
+		currEnergy = max(0, currEnergy);
+	}
 
+	fill("navy");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currEnergy, 0, maxEnergy, 0, maxW), dim - 20);
+	
+	if (gameSpeed != 0) {
+		if(currEnergy < maxEnergy*0.03) {
+			currHealth -= 1/60 * gameSpeed;
+		} else if(currEnergy > maxEnergy*0.9) {
+			currHealth += 1/60 * gameSpeed;
+		}
+		// energy cannot be lower than 0 and not higher than maxEnergy
+		currHealth = min(maxHealth, currHealth);
+		currHealth = max(0, currHealth);
+
+		if(currHealth == 0){
+			gameOver();
+		}
+	}
+	
+	fill("maroon");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currHealth, 0, maxHealth, 0, maxW), dim - 20);
+
+}
+
+function gameOver(){
+	print("You died!");
+	// disable control, pause, notify
+	
 }
 
 let divSleepBox, divWorkBox, divRecreationBox;
@@ -517,19 +553,18 @@ function loadClock() {
 	divClock.position(xPos, yPos).size(dim, dim);
 }
 
-const digits = {minimumIntegerDigits: 2};
+const digits = { minimumIntegerDigits: 2 };
 function updateClock() {
 	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
 	var hour = floor(currentMins / 60);
 	var min = floor(currentMins % 60);
-	
+
 	const hourDeg = ((hour + 11) % 12 + 1) * 30;
 	const minuteDeg = min * 6;
 	clockTooltip.html("Time:\t" + hour.toLocaleString(undefined, digits) + ":" + min.toLocaleString(undefined, digits));
 	clockTooltip.html("<br>Day:\t" + dayNr, true);
-	clockTooltip.html("<br>Season:\t" + season.name, true);
-	
-	//(6).toLocaleString(undefined, {minimumIntegerDigits: 2})
+	//clockTooltip.html("<br>Season:\t" + season.name, true);
+
 	document.querySelector('.hour').style.transform = `rotate(${hourDeg}deg)`;
 	document.querySelector('.minute').style.transform = `rotate(${minuteDeg}deg)`;
 }

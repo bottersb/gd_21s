@@ -83,7 +83,7 @@ var dailySchedule = [
 	"Recreation",
 	"Recreation",
 	"Work",
-	"Work",
+	"Recreation",
 	"Recreation",
 	"Sleep"
 ];
@@ -206,7 +206,7 @@ const fenster = {
 	h: 40
 }, i_ceilingLamp = {
 	x: 830,
-	y: 170,
+	y: 180,
 	w: 80,
 	h: 90
 };
