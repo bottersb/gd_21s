@@ -54,12 +54,17 @@ var fontRegular;
 // buttons
 var pause, play, faster, fastest;
 
+// selectors
+var sRandom, sDifficulty;
+
 // indicators
-var i_energy, i_light, i_melatonin, i_heart;
+var i_energy, i_light, i_melatonin, i_heart, i_apple, i_smiley,
+i_smiley_sad, i_smiley_unhappy, i_smiley_neutral, i_smiley_happy, i_smiley_ecstatic;
 
 const imgSize = 640;
 var edge = 600, padding = 10;
-var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board, ceilingLamp;
+var bed, bonsai, lamp, desk, ball, shelf, chair, laptop, counter, wecker, monitor, board, ceilingLamp, dreamcatcher, fireplace;
+var outdoor, windowFrame;
 
 var dailySchedule = [
 	"Sleep",
@@ -150,15 +155,15 @@ const fenster = {
 	w: 250,
 	h: 150
 }, i_ball = {
-	x: 1050,
+	x: 230,
 	y: 570,
 	w: 50,
 	h: 50
 }, i_lamp = {
 	x: 580,
-	y: 490,
+	y: 470,
 	w: 100,
-	h: 140
+	h: 150
 }, i_bed = {
 	x: 240,
 	y: 500,
@@ -171,9 +176,9 @@ const fenster = {
 	h: 100
 }, i_desk = {
 	x: 830,
-	y: 490,
+	y: 470,
 	w: 240,
-	h: 160
+	h: 190
 }, i_chair = {
 	x: 730,
 	y: 510,
@@ -181,12 +186,12 @@ const fenster = {
 	h: 180
 }, i_laptop = {
 	x: 910,
-	y: 455,
+	y: 440,
 	w: 80,
 	h: 50
 }, i_board = {
 	x: 1000,
-	y: 350,
+	y: 310,
 	w: 260,
 	h: 190
 }, i_shelf = {
@@ -209,6 +214,21 @@ const fenster = {
 	y: 180,
 	w: 80,
 	h: 90
+}, i_poster = {
+	x: 800,
+	y: 380,
+	w: 60,
+	h: 90
+}, i_dreamcatcher = {
+	x: 800,
+	y: 380,
+	w: 60,
+	h: 120
+}, i_fireplace = {
+	x: 1070,
+	y: 480,
+	w: 200,
+	h: 160
 };
 
 var infoBoxLongFiller = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod temporiii incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
@@ -217,4 +237,9 @@ infoBoxLight = "<b>Light</b><br> When eyes receive light from the sun, the pinea
 infoBoxMelatonin = "<b>Melatonin</b><br> Melatonin is a hormone primarily released by the pineal gland at night, and has long been associated with control of the sleep–wake cycle.",
 infoBoxEnergy = "<b>Energy</b><br> This indicator displays your current energy level. A full bar means you have plenty of energy to spare for the tasks of the day such as programming a game about sleep. A low bar means you are very tired and should go to sleep. Staying awake for extended periods of time on end can have negative effects on your health!",
 infoBoxHealth = "<b>Health</b><br> Sleep has a direct effect on your health! Sleep plenty to stay healthy. Not sleeping enough can make you sick as your body has a no time regenerate and fight off diseases. Not sleeping for several days can even be fatal!",
-infoBoxSchedule = "<b>Schedule</b><br> This is your schedule. It shows your daily routine in hourly segments starting at 0 (the first hour of the day) and ending at 23. You can adjust it by clicking on the colored boxes next to an activity and then clicking in the position in the schedule."
+infoBoxSchedule = "<b>Schedule</b><br> This is your schedule. It shows your daily routine in hourly segments starting at 0 (the first hour of the day) and ending at 23. You can adjust it by clicking on the colored boxes next to an activity and then clicking in the position in the schedule.",
+infoBoxGameOver = "<b>Game Over</b><br> Your health ran out. Please restart the game by pressing F5."
+infoBoxFood = "<b>Food</b><br> Food is a vital resource, which is acquired by working. Working will increase your food stockpile, however you only have limited space and can only stockpile a certain amount of food. When not working your food reserves will decrease due to other activities. When food runs low your mood will decrease, when food runs out it will affect your health."
+infoBoxHappiness = "<b>Happiness</b><br> Your happiness is positively influenced by recreation. If you become unhappy, your work efficiency will suffer. Working, very low energy (10%) and low health will decrease your happiness."
+infoBoxRandom = "<b>Random</b><br> Select if you want random events to happen."
+infoBoxDifficulty = "<b>Difficulty</b><br> Select your difficulty."

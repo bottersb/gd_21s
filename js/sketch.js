@@ -17,6 +17,8 @@ function preload() {
 	wecker = loadImage('img/clock-1293099_640.png');
 	monitor = loadImage('img/monitor-2026552_640.png');
 	board = loadImage('img/whiteboard-3205371_640.png');*/
+	outdoor = loadImage('img/evergreen-2025158.png');
+	windowFrame = loadImage('img/window-576026_640.png');
 }
 
 
@@ -30,7 +32,7 @@ function setup() {
 	loadClock();
 	loadSchedule();
 	loadInterior();
-	//110,210   1170,750
+	loadSelectors();
 	infoBox = createDiv().addClass("infoBox").position(110, 210).size(1060, 520);
 	infoBoxCloser = createSpan("X").id("infoCloser").addClass("infoCloser").mouseReleased(function () { infoBox.toggleClass("show"); });
 	showInfoBox(infoBoxGameInfo);
@@ -43,35 +45,62 @@ function draw() {
 	drawRoom();
 	updateClock();
 	darkenRoom();
-	//drawSchedule();
 	drawIndicators();
 	drawOutline();
+	//print(mouseX + " " + mouseY);
 	if (debug) {
 		debugDisplay();
 	}
 }
 
+function loadSelectors(){
+	// difficulty
+	//sDifficulty = createImg('img/rubiks-cube-145949_640.png').position(790, 80).size(40, 40);
+	sDifficulty = createImg('img/rubiks-cube-157058_640.png').position(820, 80).size(40, 40);
+	sDifficulty.elt.draggable = false;
+	sDifficulty.mouseOver(pulse).mouseOut(pulse).mouseReleased(showDifficultyInfo);
+	let difSlider = createSlider(1, 3, 2, 1);
+	difSlider.position(880, 80);
+	difSlider.style('width', '60px');
+
+	// random
+	sRandom = createImg('img/dice-151867_640.png').position(820, 140).size(40, 40);
+	sRandom.elt.draggable = false;
+	sRandom.mouseOver(pulse).mouseOut(pulse).mouseReleased(showRandomInfo);
+
+	let randomToggleContainer = createElement('label').position(880, 142);
+	randomToggleContainer.toggleClass("switch");
+
+	let randomToggleSlider = createSpan('');
+	randomToggleSlider.toggleClass('slider');
+
+	let randomToggleInput = createInput('', 'checkbox');
+	
+	randomToggleInput.parent(randomToggleContainer);
+	randomToggleSlider.parent(randomToggleContainer);
+}
+
 function loadControls() {
 	var xPos = 1000, yPos = 110, p = 0, dim = 40;
-	pause = createImg('img/pause.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
+	pause = createImg('img/pause_c.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	pause.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	pause.elt.draggable = false;
 	pause.elt.name = "pause";
 	pause.elt.speed = 0;
 
-	play = createImg('img/play.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
+	play = createImg('img/play_c.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	play.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	play.elt.draggable = false;
 	play.elt.name = "play";
 	play.elt.speed = 1;
 
-	faster = createImg('img/faster.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
+	faster = createImg('img/faster_c.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	faster.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	faster.elt.draggable = false;
 	faster.elt.name = "faster";
 	faster.elt.speed = 2;
 
-	fastest = createImg('img/fastest.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
+	fastest = createImg('img/fastest_c.png').position(xPos + (dim * 1.5 * p++), yPos).size(dim, dim);
 	fastest.mouseOver(controlsEventHandler).mouseOut(controlsEventHandler).mouseReleased(controlsEventHandler);
 	fastest.elt.draggable = false;
 	fastest.elt.name = "fastest";
@@ -155,10 +184,14 @@ function drawRoom() {
 	fill("SaddleBrown");
 	rect(0, edge, width, height - edge);
 	// window
-	fill("Brown");
-	rect(fenster.x, fenster.y, fenster.w, fenster.h);
-	fill(skyColor);
+	image(outdoor, fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
+	let sunHeight = (getSunHeight() + 1) / 2;
+	// blue
+	let c = color('hsba(197, 43%, ' + season(sunHeight) + '%, '+ (1-0.99*sunHeight) +')');
+	fill(c);
 	rect(fenster.x + padding, fenster.y + padding, fenster.w - (2 * padding), fenster.h - (2 * padding));
+	image(windowFrame, fenster.x, fenster.y, fenster.w, fenster.h);
+	
 	// ceiling
 	fill("LightSlateGray");
 	rect(0, height - edge, width, -edge);
@@ -166,11 +199,10 @@ function drawRoom() {
 
 function loadInterior() {
 	bonsai = createImg('img/bonsai-154570_640.png').position(i_bonsai.x, i_bonsai.y).size(i_bonsai.w, i_bonsai.h);
+	bed = createImg('img/bed-575800_640.png').position(i_bed.x, i_bed.y).size(i_bed.w, i_bed.h);
+	bed.mouseOver(glow).mouseOut(glow);
 	ball = createImg('img/basketball-155997_640.png').position(i_ball.x, i_ball.y).size(i_ball.w, i_ball.h);
 	ball.mouseOver(glow).mouseOut(glow);
-	bed = createImg('img/bed-575800_640.png').position(i_bed.x, i_bed.y).size(i_bed.w, i_bed.h);
-	//bed = createImg('img/bed-575800.svg').position(i_bed.x, i_bed.y).size(i_bed.w, i_bed.h);
-	bed.mouseOver(glow).mouseOut(glow);
 	lamp = createImg('img/lamp-575998_640.png').position(i_lamp.x, i_lamp.y).size(i_lamp.w, i_lamp.h);
 	lamp.mouseOver(glow).mouseOut(glow);
 	desk = createImg('img/desk-575953_640.png').position(i_desk.x, i_desk.y).size(i_desk.w, i_desk.h);
@@ -181,10 +213,14 @@ function loadInterior() {
 	shelf.mouseOver(glow).mouseOut(glow);
 	counter = createImg('img/counter-576093_640.png').position(i_counter.x, i_counter.y).size(i_counter.w, i_counter.h);
 	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
-	postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
-	postit.mouseOver(pulse).mouseOut(pulse);
-	ceilingLamp = createImg('img/lights-576011_640.png').position(i_ceilingLamp.x, i_ceilingLamp.y).size(i_ceilingLamp.w, i_ceilingLamp.h);
-
+	//poster = createImg('img/wrestler-149840_640.png').position(i_poster.x, i_poster.y).size(i_poster.w, i_poster.h);
+	dreamcatcher = createImg('img/dream-catcher-1904179_640.png').position(i_dreamcatcher.x, i_dreamcatcher.y).size(i_dreamcatcher.w, i_dreamcatcher.h);
+	dreamcatcher.mouseOver(glow).mouseOut(glow);
+	//postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
+	//postit.mouseOver(pulse).mouseOut(pulse);
+	fireplace = createImg('img/fireplace-575989_640.png').position(i_fireplace.x, i_fireplace.y).size(i_fireplace.w, i_fireplace.h);
+	fireplace.mouseOver(glow).mouseOut(glow);
+	
 }
 
 function pulse(event) {
@@ -229,6 +265,39 @@ function showScheduleInfo() {
 	showInfoBox(infoBoxSchedule);
 }
 
+function showFoodInfo() {
+	showInfoBox(infoBoxFood);
+}
+
+function showHappinessInfo() {
+	showInfoBox(infoBoxHappiness);
+}
+
+function showRandomInfo() {
+	showInfoBox(infoBoxRandom);
+}
+
+function showDifficultyInfo() {
+	showInfoBox(infoBoxDifficulty);
+}
+
+function showGameOverInfo() {
+	play.elt.classList.remove("selected");
+	faster.elt.classList.remove("selected");
+	fastest.elt.classList.remove("selected");
+
+	lastGameSpeed = gameSpeed = 0;
+	pause.elt.classList.toggle("selected");
+	
+	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
+	var hour = floor(currentMins / 60);
+	var min = floor(currentMins % 60);
+	infoBox.html("");
+	infoBox.html(infoBoxGameOver, true);
+	infoBox.html("<br>You lasted <b>" + dayNr + "</b> days, <b>" + hour.toLocaleString(undefined, digits) + "</b> hours and <b>" + min.toLocaleString(undefined, digits) + "</b> minutes.", true);
+	infoBox.toggleClass("show");
+}
+
 function showInfoBox(content) {
 	infoBox.html("");
 	infoBoxCloser.parent(infoBox);
@@ -236,7 +305,7 @@ function showInfoBox(content) {
 	infoBox.toggleClass("show");
 }
 
-
+var smileyX, smileyY;
 function loadIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, p = 0;
 
@@ -255,6 +324,64 @@ function loadIndicators() {
 	i_heart = createImg('img/heart-1297159_640_res.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
 	i_heart.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHealthInfo);
 	i_heart.elt.draggable = false;
+
+	i_apple = createImg('img/apple-1293174_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
+	i_apple.mouseOver(pulse).mouseOut(pulse).mouseReleased(showFoodInfo);
+	i_apple.elt.draggable = false;
+
+	smileyX = xPos, smileyY = yPos + (dim * 1.2 * p++);
+	i_smiley_sad = createImg('img/smiley-1635452_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_sad.elt.draggable = false;
+	i_smiley_unhappy = createImg('img/smiley-1635448_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_unhappy.elt.draggable = false;
+	i_smiley_neutral = createImg('img/smiley-1635450_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_neutral.elt.draggable = false;
+	i_smiley_happy = createImg('img/smiley-1635449_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_happy.elt.draggable = false;
+	i_smiley_ecstatic = createImg('img/smiley-1635451_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_ecstatic.elt.draggable = false;
+
+	setHappiness();
+	//i_smiley = createImg('img/smiley-1635449_640.png').id("smiley").position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
+	//i_smiley.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	//i_smiley.elt.draggable = false;
+}
+
+// sad, unhappy, neutral, happy, ecstatic
+var happinessState, 
+// has to be the same as in loadIndicators
+indicatorDim = 50;
+function setHappiness(){
+	if(currHappiness < 20 && happinessState !== "sad"){
+		print("bla");
+		happinessState = "sad";
+		hideAllSmileys();
+		i_smiley_sad.size(indicatorDim, indicatorDim);
+	} else if(currHappiness >= 20 && currHappiness < 40 && happinessState !== "unhappy"){
+		happinessState = "unhappy";
+		hideAllSmileys();
+		i_smiley_unhappy.size(indicatorDim, indicatorDim);
+	} else if(currHappiness >= 40 && currHappiness < 60 && happinessState !== "neutral"){
+		happinessState = "neutral";
+		hideAllSmileys();
+		i_smiley_neutral.size(indicatorDim, indicatorDim);
+	} else if(currHappiness >= 60 && currHappiness < 80 && happinessState !== "happy"){
+		happinessState = "happy";
+		hideAllSmileys();
+		i_smiley_happy.size(indicatorDim, indicatorDim);
+	} else if(currHappiness >= 80 && happinessState !== "ecstatic"){
+		happinessState = "ecstatic";
+		hideAllSmileys();
+		i_smiley_ecstatic.size(indicatorDim, indicatorDim);
+	} 
+}
+
+function hideAllSmileys(){
+	i_smiley_sad.size(0,0);
+	i_smiley_unhappy.size(0,0);
+	i_smiley_neutral.size(0,0);
+	i_smiley_happy.size(0,0);
+	i_smiley_happy.size(0,0);
 }
 
 function getScheduledActivity() {
@@ -263,8 +390,8 @@ function getScheduledActivity() {
 }
 
 
-const maxHealth = 96, maxEnergy = 16;
-var brightness = 0, currMelatonin = 0.7, currEnergy = 6, currHealth = 96;
+const maxHealth = 96, maxEnergy = 16, maxFood = 18, maxHappiness = 100;
+var brightness = 0, currMelatonin = 0.7, currEnergy = 6, currHealth = 96, currFood = 15, currHappiness = 75;
 var melatoninDelta = 0.008;
 function drawIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, maxW = 150, p = 0;
@@ -280,16 +407,24 @@ function drawIndicators() {
 	// current time on schedule
 	rect(map(timeCounterRelative, 0, 1, startingX, startingX + (24 * w)), startingY + w, 5, 10);
 
+	var jitter = 0;
+	if(map(currHealth, 0, maxHealth, 0, 1) < 0.25) {
+		// health bar jitter
+		jitter = RAND(5);
+	}
+
 	// empty boxes
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
+	rect(xPos + dim + 10 + jitter, yPos + (dim * 1.2 * p++) + 10 + jitter, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, maxW, dim - 20);
 	// reset the vertical advance faktor
 	p = 0;
 
 
-	fill("yellow");
+	fill("lavender");
 	// TODO when working at night light will be used, add a value
 	brightness = 0.99 * season(getSunHeight());
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(brightness, 0, 100, 0, maxW), dim - 20);
@@ -335,6 +470,7 @@ function drawIndicators() {
 	fill("navy");
 	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currEnergy, 0, maxEnergy, 0, maxW), dim - 20);
 	
+	// health
 	if (gameSpeed != 0) {
 		if(currEnergy < maxEnergy*0.03) {
 			currHealth -= 1/60 * gameSpeed;
@@ -351,14 +487,49 @@ function drawIndicators() {
 	}
 	
 	fill("maroon");
-	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currHealth, 0, maxHealth, 0, maxW), dim - 20);
+	rect(xPos + dim + 10 + jitter, yPos + (dim * 1.2 * p++) + 10 + jitter, map(currHealth, 0, maxHealth, 0, maxW), dim - 20);
 
+	// food
+	// 1h work = +3 food
+	// 1h else = -1/3 food
+	if (gameSpeed != 0) {
+		if(getScheduledActivity() == "Work") {
+			currFood += (1/60 * gameSpeed) * 3;
+		} else {
+			currFood -= (1/60 * gameSpeed) * 1/3;
+		}
+
+		// food cannot be lower than 0 and not higher than maxFood
+		currFood = min(maxFood, currFood);
+		currFood = max(0, currFood);
+	}
+
+	fill("limegreen");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currFood, 0, maxFood, 0, maxW), dim - 20);
+	
+	//happiness
+	if (gameSpeed != 0) {
+
+		if(getScheduledActivity() == "Recreation") {
+			currHappiness += (1/60 * gameSpeed) * 1;
+		} else if(getScheduledActivity() == "Work") {
+			currHappiness -= (1/60 * gameSpeed) * 2;
+		} else {
+			currHappiness += (1/60 * gameSpeed) * 1/4;
+		}
+		// Happiness cannot be lower than 0 and not higher than maxHappiness
+		currHappiness = min(maxHappiness, currHappiness);
+		currHappiness = max(0, currHappiness);
+
+		setHappiness();
+	}
+
+	fill("yellow");
+	rect(xPos + dim + 10, yPos + (dim * 1.2 * p++) + 10, map(currHappiness, 0, maxHappiness, 0, maxW), dim - 20);
 }
 
 function gameOver(){
-	print("You died!");
-	// disable control, pause, notify
-	
+	showGameOverInfo();
 }
 
 let divSleepBox, divWorkBox, divRecreationBox;
@@ -461,7 +632,7 @@ function mouseInside(x, y, w, h) {
 var currentLight;
 function darkenRoom() {
 	// get light, darken room, TODO move to different function
-	let c = color('hsba(180, 100%, 0%,' + 0.80 * (1 - season(getSunHeight()) / 100) + ')');
+	let c = color('hsba(180, 100%, 0%,' + 0.8 * (1 - season(getSunHeight()) / 100) + ')');
 	currentLight = c;
 	fill(c);
 	rect(0, 0, width, height);
@@ -533,7 +704,7 @@ function deltaTLimiter() {
 
 var clockTooltip;
 function loadClock() {
-	let xPos = 800, yPos = 400, dim = 40;
+	let xPos = 925, yPos = 350, dim = 40;
 
 	let divClock = createDiv();
 	divClock.class('clock');
@@ -558,13 +729,12 @@ function updateClock() {
 	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
 	var hour = floor(currentMins / 60);
 	var min = floor(currentMins % 60);
-
-	const hourDeg = ((hour + 11) % 12 + 1) * 30;
-	const minuteDeg = min * 6;
 	clockTooltip.html("Time:\t" + hour.toLocaleString(undefined, digits) + ":" + min.toLocaleString(undefined, digits));
 	clockTooltip.html("<br>Day:\t" + dayNr, true);
-	//clockTooltip.html("<br>Season:\t" + season.name, true);
-
+	
+	const hourDeg = ((hour + 11) % 12 + 1) * 30;
+	const minuteDeg = min * 6;
+	
 	document.querySelector('.hour').style.transform = `rotate(${hourDeg}deg)`;
 	document.querySelector('.minute').style.transform = `rotate(${minuteDeg}deg)`;
 }
