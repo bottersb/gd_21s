@@ -5,22 +5,9 @@
 
 function preload() {
 	fontRegular = loadFont('res/Poppins-Regular.ttf');
-	/*lamp = loadImage('img/lamp-575998_640.png');
-	ball = loadImage('img/basketball-155997_640.png');
-	bed = loadImage('img/bed-575800_640.png');
-	bonsai = loadImage('img/bonsai-154570_640.png');
-	desk = loadImage('img/desk-575953_640.png');
-	chair = loadImage('img/office-chair-575881_640.png');
-	laptop = loadImage('img/computer-156583_640.png');
-	shelf = loadImage('img/shelf-159852_640.png');
-	counter = loadImage('img/counter-576093_640.png');
-	wecker = loadImage('img/clock-1293099_640.png');
-	monitor = loadImage('img/monitor-2026552_640.png');
-	board = loadImage('img/whiteboard-3205371_640.png');*/
 	outdoor = loadImage('img/evergreen-2025158.png');
 	windowFrame = loadImage('img/window-576026_640.png');
 }
-
 
 var infoBox, infoBoxCloser;
 function setup() {
@@ -47,37 +34,135 @@ function draw() {
 	darkenRoom();
 	drawIndicators();
 	drawOutline();
+	randomEvent();
 	//print(mouseX + " " + mouseY);
 	if (debug) {
 		debugDisplay();
 	}
 }
 
-function loadSelectors(){
+var sliderToolTip, difMap = ["Easy", "Normal", "Hard"]
+function difSliderOnChange(event){
+	difficulty = event.target.value;
+	let difName = difMap[difficulty - 1]
+	sliderToolTip.html("<span class=\"dif" + difName + "\">"+difName+"</span>");
+}
+
+var difficulty = 2;
+function loadSelectors(){	
 	// difficulty
 	//sDifficulty = createImg('img/rubiks-cube-145949_640.png').position(790, 80).size(40, 40);
 	sDifficulty = createImg('img/rubiks-cube-157058_640.png').position(820, 80).size(40, 40);
 	sDifficulty.elt.draggable = false;
-	sDifficulty.mouseOver(pulse).mouseOut(pulse).mouseReleased(showDifficultyInfo);
-	let difSlider = createSlider(1, 3, 2, 1);
-	difSlider.position(880, 80);
-	difSlider.style('width', '60px');
+	sDifficulty.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoDifficulty);
 
+	let divDifSlider = createDiv().position(880, 80);
+	divDifSlider.class('difficulty');
+	let difSlider = createSlider(1, 3, difficulty, 1);
+	difSlider.style('width', '60px');
+	sliderToolTip = createSpan().addClass("tooltiptext");
+	let difName = difMap[difficulty - 1]
+	sliderToolTip.html("<span class=\"dif" + difName + "\">"+difName+"</span>");
+
+	difSlider.parent(divDifSlider);
+	sliderToolTip.parent(divDifSlider);
+
+	difSlider.input(difSliderOnChange);
+	
 	// random
 	sRandom = createImg('img/dice-151867_640.png').position(820, 140).size(40, 40);
 	sRandom.elt.draggable = false;
-	sRandom.mouseOver(pulse).mouseOut(pulse).mouseReleased(showRandomInfo);
+	sRandom.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoRandom);
 
 	let randomToggleContainer = createElement('label').position(880, 142);
 	randomToggleContainer.toggleClass("switch");
 
 	let randomToggleSlider = createSpan('');
 	randomToggleSlider.toggleClass('slider');
+	randomToggleSlider.mouseReleased(toggleRandomEvents)
 
-	let randomToggleInput = createInput('', 'checkbox');
+	let randomToggleInput = createInput('', 'checkbox')
 	
 	randomToggleInput.parent(randomToggleContainer);
 	randomToggleSlider.parent(randomToggleContainer);
+}
+
+var randomEventsEnabled = false;
+function toggleRandomEvents(){
+	randomEventsEnabled = !randomEventsEnabled;
+}
+
+var spawnFrame = -1
+function randomEvent(){
+	if(gameSpeed == 0) {
+		return;
+	}
+
+	// handle current event
+	if(currRandomEvent !== undefined){
+		//handle long running random event
+	}
+
+	// no events
+	if(randomEventsEnabled == false) {
+		return;
+	} 
+	if(spawnFrame > frameCounterGame) {
+		// not time yet
+		return;
+	} 
+	if(spawnFrame + 4 < frameCounterGame) {
+		currRandomEvent = undefined;
+		spawnFrame = RAND(MIN_PER_DAY * 10);
+	}
+	
+	else {
+		spawnRandomEvent();
+	}
+}
+
+var currRandomEvent, currEventDescription, eventEndDay, eventEndHour, eventEndMin;
+function spawnRandomEvent(){
+	// pause game
+	pause.elt.classList.remove("selected");
+	play.elt.classList.remove("selected");
+	faster.elt.classList.remove("selected");
+	fastest.elt.classList.remove("selected");
+	pause.elt.classList.toggle("selected");
+	gameSpeed = 0;
+
+	// get random unspawned event from list
+	currRandomEvent = randomEvents[RAND(randomEvents.length)]
+	currEventDescription = currRandomEvent["desc"];
+	if(currRandomEvent["singular"] == false) {
+		
+		let currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
+		let endMinsTotal = currentMins + currRandomEvent["duration"];
+		let eventEndDay = dayNr + floor(endMinsTotal / MIN_PER_DAY);
+		let endMins = endMinsTotal % MIN_PER_DAY;
+		let eventEndHour = floor(endMins / 60);
+		var eventEndMin = floor(endMins % 60);
+		
+		currEventDescription = currEventDescription 
+		+ " The event will end at "
+		+ eventEndHour.toLocaleString(undefined, digits) + ":" + eventEndMin.toLocaleString(undefined, digits)
+		+ " on day " + eventEndDay;
+	} 
+
+	if(currRandomEvent["id"] == "food_01"){
+		currFood = 0;
+		currRandomEvent = undefined
+	} else if(currRandomEvent["id"] == "work_02"){
+		currEnergy = maxEnergy;
+		currFood = maxFood;
+		currHappiness = maxHappiness;
+		currRandomEvent = undefined
+	} else {
+		// postit
+		// visualize effect
+	}
+
+	showInfoRandomEvent();
 }
 
 function loadControls() {
@@ -199,28 +284,28 @@ function drawRoom() {
 
 function loadInterior() {
 	bonsai = createImg('img/bonsai-154570_640.png').position(i_bonsai.x, i_bonsai.y).size(i_bonsai.w, i_bonsai.h);
+	bonsai.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoPlants);
 	bed = createImg('img/bed-575800_640.png').position(i_bed.x, i_bed.y).size(i_bed.w, i_bed.h);
-	bed.mouseOver(glow).mouseOut(glow);
+	bed.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoSleepStages);
 	ball = createImg('img/basketball-155997_640.png').position(i_ball.x, i_ball.y).size(i_ball.w, i_ball.h);
-	ball.mouseOver(glow).mouseOut(glow);
+	ball.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoExcersise);
 	lamp = createImg('img/lamp-575998_640.png').position(i_lamp.x, i_lamp.y).size(i_lamp.w, i_lamp.h);
-	lamp.mouseOver(glow).mouseOut(glow);
+	lamp.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoLightSci);
 	desk = createImg('img/desk-575953_640.png').position(i_desk.x, i_desk.y).size(i_desk.w, i_desk.h);
 	chair = createImg('img/office-chair-575881_640.png').position(i_chair.x, i_chair.y).size(i_chair.w, i_chair.h);
 	laptop = createImg('img/computer-156583_640.png').position(i_laptop.x, i_laptop.y).size(i_laptop.w, i_laptop.h);
-	laptop.mouseOver(glow).mouseOut(glow);
+	laptop.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoElectronics);
 	shelf = createImg('img/shelf-159852_640.png').position(i_shelf.x, i_shelf.y).size(i_shelf.w, i_shelf.h);
-	shelf.mouseOver(glow).mouseOut(glow);
+	shelf.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoLearning);
 	counter = createImg('img/counter-576093_640.png').position(i_counter.x, i_counter.y).size(i_counter.w, i_counter.h);
 	board = createImg('img/whiteboard-3205371_640.png').position(i_board.x, i_board.y).size(i_board.w, i_board.h);
 	//poster = createImg('img/wrestler-149840_640.png').position(i_poster.x, i_poster.y).size(i_poster.w, i_poster.h);
 	dreamcatcher = createImg('img/dream-catcher-1904179_640.png').position(i_dreamcatcher.x, i_dreamcatcher.y).size(i_dreamcatcher.w, i_dreamcatcher.h);
-	dreamcatcher.mouseOver(glow).mouseOut(glow);
-	//postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
-	//postit.mouseOver(pulse).mouseOut(pulse);
+	dreamcatcher.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoDreams);
+	postit = createImg('img/note-147951_640.png').position(i_postit.x, i_postit.y).size(i_postit.w, i_postit.h);
+	postit.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoUnfinished);
 	fireplace = createImg('img/fireplace-575989_640.png').position(i_fireplace.x, i_fireplace.y).size(i_fireplace.w, i_fireplace.h);
-	fireplace.mouseOver(glow).mouseOut(glow);
-	
+	fireplace.mouseOver(glow).mouseOut(glow).mouseReleased(showInfoTemperature);
 }
 
 function pulse(event) {
@@ -245,40 +330,80 @@ function glow(event) {
 	}
 }
 
-function showLightInfo() {
+function showInfoLight() {
 	showInfoBox(infoBoxLight);
 }
 
-function showMelatoninInfo() {
+function showInfoMelatonin() {
 	showInfoBox(infoBoxMelatonin);
 }
 
-function showEnergyInfo() {
+function showInfoEnergy() {
 	showInfoBox(infoBoxEnergy);
 }
 
-function showHealthInfo() {
+function showInfoHealth() {
 	showInfoBox(infoBoxHealth);
 }
 
-function showScheduleInfo() {
+function showInfoSchedule() {
 	showInfoBox(infoBoxSchedule);
 }
 
-function showFoodInfo() {
+function showInfoFood() {
 	showInfoBox(infoBoxFood);
 }
 
-function showHappinessInfo() {
+function showInfoHappiness() {
 	showInfoBox(infoBoxHappiness);
 }
 
-function showRandomInfo() {
+function showInfoRandom() {
 	showInfoBox(infoBoxRandom);
 }
 
-function showDifficultyInfo() {
+function showInfoDifficulty() {
 	showInfoBox(infoBoxDifficulty);
+}
+
+function showInfoExcersise() {
+	showInfoBox(infoBoxExcersise);
+}
+
+function showInfoDreams() {
+	showInfoBox(infoBoxDreams);
+}
+
+function showInfoTemperature() {
+	showInfoBox(infoBoxTemperature);
+}
+
+function showInfoElectronics() {
+	showInfoBox(infoBoxElectronics);
+}
+
+function showInfoLearning() {
+	showInfoBox(infoBoxLearning);
+}
+
+function showInfoPlants() {
+	showInfoBox(infoBoxPlants);
+}
+
+function showInfoLightSci() {
+	showInfoBox(infoBoxLightSci);
+}
+
+function showInfoSleepStages() {
+	showInfoBox(infoBoxSleepStages);
+}
+
+function showInfoRandomEvent() {
+	showInfoBox(currEventDescription);
+}
+
+function showInfoUnfinished() {
+	showInfoBox(infoBoxUnfinished);
 }
 
 function showGameOverInfo() {
@@ -310,41 +435,38 @@ function loadIndicators() {
 	var xPos = 20, yPos = 220, dim = 50, p = 0;
 
 	i_light = createImg('img/light-156054_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_light.mouseOver(pulse).mouseOut(pulse).mouseReleased(showLightInfo);
+	i_light.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoLight);
 	i_light.elt.draggable = false;
 
 	i_melatonin = createImg('img/melatonin.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_melatonin.mouseOver(pulse).mouseOut(pulse).mouseReleased(showMelatoninInfo);
+	i_melatonin.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoMelatonin);
 	i_melatonin.elt.draggable = false;
 
 	i_energy = createImg('img/battery-151574_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_energy.mouseOver(pulse).mouseOut(pulse).mouseReleased(showEnergyInfo);
+	i_energy.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoEnergy);
 	i_energy.elt.draggable = false;
 
 	i_heart = createImg('img/heart-1297159_640_res.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_heart.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHealthInfo);
+	i_heart.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHealth);
 	i_heart.elt.draggable = false;
 
 	i_apple = createImg('img/apple-1293174_640.png').position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	i_apple.mouseOver(pulse).mouseOut(pulse).mouseReleased(showFoodInfo);
+	i_apple.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoFood);
 	i_apple.elt.draggable = false;
 
 	smileyX = xPos, smileyY = yPos + (dim * 1.2 * p++);
-	i_smiley_sad = createImg('img/smiley-1635452_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_sad = createImg('img/smiley-1635452_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHappiness);
 	i_smiley_sad.elt.draggable = false;
-	i_smiley_unhappy = createImg('img/smiley-1635448_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_unhappy = createImg('img/smiley-1635448_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHappiness);
 	i_smiley_unhappy.elt.draggable = false;
-	i_smiley_neutral = createImg('img/smiley-1635450_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_neutral = createImg('img/smiley-1635450_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHappiness);
 	i_smiley_neutral.elt.draggable = false;
-	i_smiley_happy = createImg('img/smiley-1635449_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_happy = createImg('img/smiley-1635449_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHappiness);
 	i_smiley_happy.elt.draggable = false;
-	i_smiley_ecstatic = createImg('img/smiley-1635451_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
+	i_smiley_ecstatic = createImg('img/smiley-1635451_640.png').position(smileyX, smileyY).size(0, 0).mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoHappiness);
 	i_smiley_ecstatic.elt.draggable = false;
 
 	setHappiness();
-	//i_smiley = createImg('img/smiley-1635449_640.png').id("smiley").position(xPos, yPos + (dim * 1.2 * p++)).size(dim, dim);
-	//i_smiley.mouseOver(pulse).mouseOut(pulse).mouseReleased(showHappinessInfo);
-	//i_smiley.elt.draggable = false;
 }
 
 // sad, unhappy, neutral, happy, ecstatic
@@ -388,7 +510,6 @@ function getScheduledActivity() {
 	var index = floor(map(timeCounterRelative, 0, 1, 0, 23))
 	return dailySchedule[index];
 }
-
 
 const maxHealth = 96, maxEnergy = 16, maxFood = 18, maxHappiness = 100;
 var brightness = 0, currMelatonin = 0.7, currEnergy = 6, currHealth = 96, currFood = 15, currHappiness = 75;
@@ -494,7 +615,8 @@ function drawIndicators() {
 	// 1h else = -1/3 food
 	if (gameSpeed != 0) {
 		if(getScheduledActivity() == "Work") {
-			currFood += (1/60 * gameSpeed) * 3;
+			let gainFactor = currHappiness < 40 ? 1.5 : 3;
+			currFood += (1/60 * gameSpeed) * gainFactor;
 		} else {
 			currFood -= (1/60 * gameSpeed) * 1/3;
 		}
@@ -509,14 +631,42 @@ function drawIndicators() {
 	
 	//happiness
 	if (gameSpeed != 0) {
+		let moodFactor = 1, scheduleFactor;
 
+		if(currEnergy <= maxEnergy/10 || currHealth <= maxHealth/2){
+			if(getScheduledActivity() == "Work") {
+				// negative effect doubled
+				if (difficulty == 1) {
+					moodFactor = 0;
+				} else {
+					moodFactor = 2;
+				}
+			} else {
+				// positive effect halved
+				moodFactor = 1/2;
+			}
+		} 
+		
 		if(getScheduledActivity() == "Recreation") {
-			currHappiness += (1/60 * gameSpeed) * 1;
+			// increase
+			scheduleFactor = 1;
 		} else if(getScheduledActivity() == "Work") {
-			currHappiness -= (1/60 * gameSpeed) * 2;
+			
+			if(difficulty == 1) { 
+				scheduleFactor = 1/5;
+			}
+			// decrease
+			else if(difficulty == 3) { 
+				scheduleFactor = (-4);
+			} else {
+				scheduleFactor = (-2);
+			}
 		} else {
-			currHappiness += (1/60 * gameSpeed) * 1/4;
+			// slight increase
+			scheduleFactor = 1/3;
 		}
+		currHappiness += (1/60 * gameSpeed) * scheduleFactor * moodFactor;
+		
 		// Happiness cannot be lower than 0 and not higher than maxHappiness
 		currHappiness = min(maxHappiness, currHappiness);
 		currHappiness = max(0, currHappiness);
@@ -539,7 +689,7 @@ function loadSchedule() {
 		w = 30;
 
 	let divScheduleText = createDiv("Schedule:").position(startingX, 78);
-	divScheduleText.mouseOver(pulse).mouseOut(pulse).mouseReleased(showScheduleInfo);
+	divScheduleText.mouseOver(pulse).mouseOut(pulse).mouseReleased(showInfoSchedule);
 	divScheduleText.addClass('scheduleText');
 
 	divSleepBox = createDiv().position(230, 80);
@@ -638,7 +788,9 @@ function darkenRoom() {
 	rect(0, 0, width, height);
 }
 
+
 function drawSunCicle() {
+
 	var sunHeight = (getSunHeight() + 1) / 2;
 	// blue
 	skyColor = color('hsb(197, 43%,' + season(sunHeight) + '%)');
@@ -651,8 +803,9 @@ function drawSunCicle() {
 }
 
 // day starts at 0:00, sun should be lowest
+var eclipse = false;
 var getSunHeight = function () {
-	return -cos(timeCounter);
+	return eclipse ? -1 : -cos(timeCounter);
 }
 
 function debugDisplay() {
@@ -684,6 +837,7 @@ function updateDelta() {
 	dayNr = floor(timeCounter / TWO_PI);
 
 	frameCounter += 1;
+	frameCounterGame += gameSpeed;
 	fpsNow = round(1000 / deltaT);
 	if (frameCounter % debugUpdateDelay == 0) {
 		fpsShow = fpsNow;
@@ -727,13 +881,13 @@ function loadClock() {
 const digits = { minimumIntegerDigits: 2 };
 function updateClock() {
 	var currentMins = floor(map(timeCounterRelative, 0, 1, 0, 1440));
-	var hour = floor(currentMins / 60);
-	var min = floor(currentMins % 60);
-	clockTooltip.html("Time:\t" + hour.toLocaleString(undefined, digits) + ":" + min.toLocaleString(undefined, digits));
+	currHour = floor(currentMins / 60);
+	currMin = floor(currentMins % 60);
+	clockTooltip.html("Time:\t" + currHour.toLocaleString(undefined, digits) + ":" + currMin.toLocaleString(undefined, digits));
 	clockTooltip.html("<br>Day:\t" + dayNr, true);
 	
-	const hourDeg = ((hour + 11) % 12 + 1) * 30;
-	const minuteDeg = min * 6;
+	const hourDeg = ((currHour + 11) % 12 + 1) * 30;
+	const minuteDeg = currMin * 6;
 	
 	document.querySelector('.hour').style.transform = `rotate(${hourDeg}deg)`;
 	document.querySelector('.minute').style.transform = `rotate(${minuteDeg}deg)`;

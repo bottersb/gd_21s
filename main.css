@@ -296,4 +296,47 @@ input:checked + .slider:before {
   transform: translateX(26px);
 }
 
+#infoBoxImg {
+  max-width: 100%;
+}
 
+.difEasy {
+  color: rgb(40, 172, 0);
+}
+
+.difNormal {
+  color: rgb(0, 137, 155);
+}
+
+.difHard {
+  color: rgb(139, 0, 0);
+}
+
+.difficulty .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 150%;
+  left: 50%;
+  margin-left: -60px;
+}
+.difficulty .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.difficulty:hover .tooltiptext {
+  visibility: visible;
+}
